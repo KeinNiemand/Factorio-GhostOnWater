@@ -1,0 +1,9 @@
+{
+    "name": "GhostOnWater",
+    "version": "0.0.0",
+    "title": "Ghots On Water",
+    "author": "You",
+    "factorio_version": "1.1",
+    "dependencies": ["base >= 1.1"],
+    "description": "This mod adds the ability to place ghosts on water, by using a workaround that places dummy entities when you place somthing on water.\nTo use this mods prest Control + W while holding a blueprint this replaces everything in the blueprint with dummy entities."
+  }
