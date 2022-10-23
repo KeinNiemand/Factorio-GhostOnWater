@@ -1,6 +1,10 @@
 local constants = require('modules/constants')
 local mask_util = require("collision-mask-util")
+local util = require("util")
+local Is = require('__stdlib__/stdlib/utils/is')
+local table = require('__stdlib__/stdlib/utils/table')
 local waterTileCollisionMask = data.raw["tile"]["water"].collision_mask
+
 
 local dummyGenerator = {}
 
@@ -94,6 +98,18 @@ local function createDummyEntity(originalEntity)
         dummyEntity.minable.results = nil
     end
 
+    if dummyEntity.placeable_by then
+        if dummyEntity.placeable_by.item then 
+            dummyEntity.placeable_by = { item = constants.dummyPrefix .. dummyEntity.placeable_by.item, count = dummyEntity.placeable_by.count }
+
+        else 
+            dummyEntity.placeable_by = table.map
+            (dummyEntity.placeable_by, 
+            function(itemToPlace) 
+                return { item = constants.dummyPrefix .. itemToPlace.item, count = itemToPlace.count }
+            end) end
+    end
+
     --return the dummy prototype
     return dummyEntity
 end
@@ -103,14 +119,27 @@ local function createDummyItem(originalItem)
             local dummyItem = table.deepcopy(originalItem)
             --change the name of the dummy prototype to dummyPrefix .. name
             dummyItem.name = constants.dummyPrefix .. originalItem.name
-            --chagne place_result to dummyPrefix .. place_result
-            dummyItem.place_result = constants.dummyPrefix .. originalItem.place_result
 
+            --chagne place_result to dummyPrefix .. place_result
+            if (dummyItem.place_result) then
+                dummyItem.place_result = constants.dummyPrefix .. dummyItem.place_result
+            end
+
+            if (dummyItem.straight_rail)
+            then
+                dummyItem.straight_rail = constants.dummyPrefix .. originalItem.straight_rail
+            end
+
+            if (dummyItem.curved_rail)
+            then
+                dummyItem.curved_rail = constants.dummyPrefix .. originalItem.curved_rail
+            end
+            
             return dummyItem
 end
 
-
 dummyGenerator.GenerateDummyPrototypes = function() 
+    
     for name, prototypeItem in pairs(data.raw["item"]) do
         if prototypeItem.place_result then
             if entityCollidesWithWaterLayer(entityTable[prototypeItem.place_result]) then
@@ -121,6 +150,44 @@ dummyGenerator.GenerateDummyPrototypes = function()
             end
         end
     end
+
+    --go trogh all rail-planners
+    for name, prototypeRailPlaner in pairs(data.raw["rail-planner"]) do
+
+
+        --return if this is a dummy rail-planner
+        if (util.string_starts_with(name, constants.dummyPrefix)) then
+            goto continue
+        end
+
+        --return if ral planer has no straight_rail
+        if prototypeRailPlaner.straight_rail == nil then
+            goto continue
+        end
+
+        --return if rail planer has no curved_rail
+        if prototypeRailPlaner.curved_rail == nil then
+            goto continue
+        end
+        
+
+        
+        local dummyItem = createDummyItem(prototypeRailPlaner)
+        data:extend({dummyItem})
+
+        if entityCollidesWithWaterLayer(entityTable[prototypeRailPlaner.straight_rail]) then 
+            local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.straight_rail])
+            data:extend({dummyEntity})
+        end
+
+        if entityCollidesWithWaterLayer(entityTable[prototypeRailPlaner.curved_rail]) then 
+            local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.curved_rail])
+            data:extend({dummyEntity})
+        end
+
+        ::continue::
+    end
+
 end
 
 return dummyGenerator
