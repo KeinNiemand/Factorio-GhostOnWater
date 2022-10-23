@@ -59,6 +59,25 @@ function replaceDummyEntityGhost(dummyEntity)
     end
 end
 
+--function that places ghost landfill under dummy entity ghosts
+function placeGhostLandfill(dummyEntity)
+    --get landfill type from settings
+    local usedLandfillType = settings.global["usedLandfillType"].value
+    local surface = dummyEntity.surface
+    local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
+    table.each (tilesUnderEntity, function(tile)
+        surface.create_entity{name = "tile-ghost", position = tile.position, force = dummyEntity.force, inner_name = usedLandfillType}
+    end)
+end
+
+--function that gets tiles in the bounding box of an entity
+function getTilesInBoundingBox(entity)
+    local surface = entity.surface
+    local boundingBox = entity.bounding_box
+    local tiles = surface.find_tiles_filtered{area = boundingBox}
+    return tiles
+end
+
 --Main function that turns dummy entity ghosts into normal entity ghosts after landfill has been placed
 function waterGhostUpdate() 
     --get all dummy entity ghosts
@@ -67,6 +86,8 @@ function waterGhostUpdate()
     for _, waterGhostEntity in pairs(waterGhostEntities) do
         --replace dummy entity ghost with original entity ghost
         replaceDummyEntityGhost(waterGhostEntity)
+        --place ghost landfill under dummy entity ghost
+        placeGhostLandfill(waterGhostEntity)
     end
 end
 
