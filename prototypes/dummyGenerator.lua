@@ -46,7 +46,6 @@ local function entityCollidesWithWaterLayer(entity)
         return false
     end
 
-    log("Checking entity: " .. entity.name)
 
     local mask = mask_util.get_mask(entity)
 
@@ -71,9 +70,6 @@ local function createDummyEntity(originalEntity)
     end
 
     --remove water-tile from collision mask
-
-
-    log("New mask: " .. serpent.line(newMask))
     dummyEntity.collision_mask = originalMask
     --remove all collsion mask items in water-tile-collsion-mask
     for _, item in pairs(waterTileCollisionMask) do
@@ -83,11 +79,8 @@ local function createDummyEntity(originalEntity)
         end
     end
     
-        
     --change the name of the dummy prototype to dummyPrefix .. name
     dummyEntity.name = constants.dummyPrefix .. dummyEntity.name
-
-    
 
     --check if next-upgrade exists
     if dummyEntity.next_upgrade then
@@ -121,7 +114,6 @@ dummyGenerator.GenerateDummyPrototypes = function()
     for name, prototypeItem in pairs(data.raw["item"]) do
         if prototypeItem.place_result then
             if entityCollidesWithWaterLayer(entityTable[prototypeItem.place_result]) then
-                log("Found entity that collides with water layer: " .. prototypeItem.place_result)
                 local dummyItem = createDummyItem(prototypeItem)
                 data:extend({dummyItem})
                 local dummyEntity = createDummyEntity(entityTable[prototypeItem.place_result])

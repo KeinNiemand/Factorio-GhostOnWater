@@ -35,10 +35,6 @@ end
 
 --function that check if the original entity could be placed in the location of the dummy entity
 function canPlaceOriginalEntity(originalEntityName, dummyEntity)
-    --print the original entity name
-    game.print("Checking entity: " .. originalEntityName)
-
-
     --check if the original entity can be placed in the location and with the same direction of the dummy entity
     --get surface
     local surface = dummyEntity.surface
@@ -48,9 +44,6 @@ function canPlaceOriginalEntity(originalEntityName, dummyEntity)
     local direction = dummyEntity.direction
     --check if the original entity can be placed
     local canPlace = surface.can_place_entity{name = originalEntityName, position = position, direction = direction}
-
-
-    game.print("Can place: " .. tostring(canPlace))
     return canPlace
 end
 
