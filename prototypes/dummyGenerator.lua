@@ -120,6 +120,12 @@ local function createDummyEntity(originalEntity)
             end) end
     end
 
+    --if the entity is not in a quick replace group, add it and the original entity to the group with the name of the dummy entity
+    if dummyEntity.fast_replaceable_group == nil then
+        dummyEntity.fast_replaceable_group = dummyEntity.name
+        originalEntity.fast_replaceable_group = dummyEntity.name
+    end
+
     --return the dummy prototype
     return dummyEntity
 end
