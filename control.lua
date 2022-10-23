@@ -79,6 +79,14 @@ function getTilesInBoundingBox(entity)
     local surface = entity.surface
     local boundingBox = entity.bounding_box
     local tiles = surface.find_tiles_filtered{area = boundingBox}
+    --if secondary_bounding_box is not nil, get tiles in secondary_bounding_box and add them to the tiles table
+    if entity.secondary_bounding_box then
+        local secondaryBoundingBox = entity.secondary_bounding_box
+        local secondaryTiles = surface.find_tiles_filtered{area = secondaryBoundingBox}
+        table.each(secondaryTiles, function(tile)
+            table.insert(tiles, tile)
+        end)
+    end
     return tiles
 end
 
