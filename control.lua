@@ -66,6 +66,10 @@ function placeGhostLandfill(dummyEntity)
     local surface = dummyEntity.surface
     local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
     table.each (tilesUnderEntity, function(tile)
+        --check if tile would collide with player
+        if (not tile.collides_with("player-layer")) or tile.has_tile_ghost() then
+            return
+        end
         surface.create_entity{name = "tile-ghost", position = tile.position, force = dummyEntity.force, inner_name = usedLandfillType}
     end)
 end
