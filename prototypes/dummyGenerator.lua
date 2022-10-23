@@ -86,6 +86,16 @@ local function createDummyEntity(originalEntity)
     --change the name of the dummy prototype to dummyPrefix .. name
     dummyEntity.name = constants.dummyPrefix .. dummyEntity.name
 
+    --add the hidden flag to the flags table
+    if dummyEntity.flags == nil then
+        dummyEntity.flags = {}
+    end
+    table.insert(dummyEntity.flags, "hidden")
+
+    --remove the not-upgradable flag from the flags table
+    table.remove(dummyEntity.flags, table.indexOf(dummyEntity.flags, "not-upgradable"))
+
+
     --check if next-upgrade exists
     if dummyEntity.next_upgrade then
     --set the next_upgrade of the dummy prototype to dummyPrefix .. next_upgrade
