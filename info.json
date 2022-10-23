@@ -1,9 +1,9 @@
 {
     "name": "GhostOnWater",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "title": "Ghots On Water",
     "author": "You",
     "factorio_version": "1.1",
     "dependencies": ["base >= 1.1", "stdlib >= 1.4.7", "? LandfillPainting"],
-    "description": "This mod adds the ability to place ghosts on water, by using a workaround that places dummy entities when you place somthing on water.\nTo use this mods prest Control + W while holding a blueprint this replaces everything in the blueprint with dummy entities."
+    "description": "This mod adds the ability to place ghosts on water, by using a workaround that places dummy entities when you place somthing on water.\nTo use this mods prest Control + W while holding a blueprint this replaces everything in the blueprint with dummy entities that can be placed on water (hotkey can be changed in settings) This does not work if the blueprin comes from the blueprint library, Converted blueprint can not be reverted to normal bluepritns and will be unusable without this mod so make sure to copy your blueprints.\nThis mod is in early alpha and might not work as intended please report issues on github."
   }
