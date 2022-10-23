@@ -52,7 +52,7 @@ local function entityCollidesWithWaterLayer(entity)
     if mask ~= nil then
         --check if the collision_mask contains the water layer
         --use serpent to print the table collision_mask
-        if table.containsValue(mask, "water-tile") then
+        if mask_util.masks_collide(mask, waterTileCollisionMask) then
             return true
         end
 
