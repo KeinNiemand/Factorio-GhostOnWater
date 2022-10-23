@@ -84,6 +84,9 @@ function updateBlueprint(event)
     --check if the player has a blueprint selected return if not
     if not player.is_cursor_blueprint() then return end
 
+    --check if player is really holding a blueprint item stack
+    local blueprintStack = player.cursor_stack
+    if not blueprintStack.valid_for_read then return end
     --get blueprint entities
     local blueprintEntities = player.get_blueprint_entities()
 
