@@ -2,6 +2,14 @@ local constants = require('modules/constants')
 local Event = require('__stdlib__/stdlib/event/event')
 local util = require('util')
 local table = require('__stdlib__/stdlib/utils/table')
+local Inventory = require('__stdlib__/stdlib/entity/inventory')
+
+--function to check if a dummy entity prototype exists
+function dummyEntityPrototypeExists(entityName)
+    --check if the dummy entity prototype exists
+    local dummyEntityPrototype = game.entity_prototypes[constants.dummyPrefix .. entityName]
+    return dummyEntityPrototype ~= nil
+end
 
 --split function above into multiple functions to make it more readable
 function getWaterGhostEntities()
@@ -69,5 +77,36 @@ function waterGhostUpdate()
     end
 end
 
+
+function updateBlueprint(event)
+    --get the player
+    local player = game.players[event.player_index]
+    --check if the player has a blueprint selected return if not
+    if not player.is_cursor_blueprint() then return end
+
+    --get blueprint entities
+    local blueprintEntities = player.get_blueprint_entities()
+
+    --replace blueprint entities with dummy entities using table.map
+    local dummyEntities = table.map(blueprintEntities, function(entity)
+        if (dummyEntityPrototypeExists(entity.name)) then
+            --replace entity with dummy entity
+            entity.name = constants.dummyPrefix .. entity.name
+        end
+        return entity
+    end)
+
+    --set the blueprint entities
+    local itemStack = player.cursor_stack
+    local blueprint = Inventory.get_blueprint(itemStack)
+    blueprint.set_blueprint_entities(dummyEntities)
+
+end
+
+
+
 --add event handler for on_tick
 Event.on_nth_tick(60, waterGhostUpdate)
+--add event handler for update blueprint shortcut using filter function
+Event.register(defines.events.on_lua_shortcut, updateBlueprint , function(event, shortcut)
+    return event.prototype_name == "waterGhostBlueprintUpdate" end, "")
