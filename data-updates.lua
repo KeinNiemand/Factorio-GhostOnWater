@@ -1,3 +1,4 @@
+local constants = require('modules/constants')
 local mask_util = require("collision-mask-util")
 local waterTileCollisionMask = data.raw["tile"]["water"].collision_mask
 
@@ -77,15 +78,15 @@ function createDummyEntity(originalEntity)
     end
     
         
-    --change the name of the dummy prototype to "dummy-" .. name
-    dummyEntity.name = "dummy-" .. dummyEntity.name
+    --change the name of the dummy prototype to dummyPrefix .. name
+    dummyEntity.name = constants.dummyPrefix .. dummyEntity.name
 
     
 
     --check if next-upgrade exists
     if dummyEntity.next_upgrade then
-    --set the next_upgrade of the dummy prototype to "dummy-" .. next_upgrade
-        dummyEntity.next_upgrade = "dummy-" .. dummyEntity.next_upgrade
+    --set the next_upgrade of the dummy prototype to dummyPrefix .. next_upgrade
+        dummyEntity.next_upgrade = constants.dummyPrefix .. dummyEntity.next_upgrade
     end
 
     --if the entity is minable, remove the mining result
@@ -101,10 +102,10 @@ end
 function createDummyItem(originalItem)
     --check if the entity has a collision mask
             local dummyItem = table.deepcopy(originalItem)
-            --change the name of the dummy prototype to "dummy-" .. name
-            dummyItem.name = "dummy-" .. originalItem.name
-            --chagne place_result to "dummy-" .. place_result
-            dummyItem.place_result = "dummy-" .. originalItem.place_result
+            --change the name of the dummy prototype to dummyPrefix .. name
+            dummyItem.name = constants.dummyPrefix .. originalItem.name
+            --chagne place_result to dummyPrefix .. place_result
+            dummyItem.place_result = constants.dummyPrefix .. originalItem.place_result
 
             return dummyItem
 end
