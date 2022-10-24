@@ -107,7 +107,7 @@ end
 --function that places ghost landfill under dummy entity ghosts
 local function placeGhostLandfill(dummyEntity)
     --get landfill type from settings
-    local usedLandfillType = settings.global["usedLandfillType"].value
+    local usedLandfillType = settings.global["WaterGhostUsedLandfillType"].value
     local surface = dummyEntity.surface
     local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
     table.each (tilesUnderEntity, function(tile)
@@ -167,7 +167,7 @@ end
 
 
 --add event handler for on_tick
-Event.on_nth_tick(600, waterGhostUpdate)
+Event.on_nth_tick(settings.global.WaterGhostUpdateDelay, waterGhostUpdate)
 --add event handler for update blueprint shortcut using filter function
 Event.register(defines.events.on_lua_shortcut, updateBlueprint , function(event, shortcut)
     return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate" end, "")
