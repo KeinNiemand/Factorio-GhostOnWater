@@ -126,7 +126,6 @@ local function createDummyEntity(originalEntity)
         originalEntity.fast_replaceable_group = dummyEntity.name
     end
 
-    log("dummyEntity.flags: " .. serpent.line(dummyEntity.flags))
     --return the dummy prototype
     return dummyEntity
 end
