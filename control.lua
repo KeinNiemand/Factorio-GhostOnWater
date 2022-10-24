@@ -5,7 +5,7 @@ local table = require('__stdlib__/stdlib/utils/table')
 local Inventory = require('__stdlib__/stdlib/entity/inventory')
 local Geom2D = require('lib/Geom2D')
 
-local updateRate = 600
+local updateRate = constants.defaultUpdateDelay
 
 --get all entity prototypes names whos name starts with constants.dummyPrefix
 local function fillWaterGhostTypes()
@@ -201,7 +201,7 @@ Event.on_configuration_changed(onConfigurationChanged)
 --add event handler for waterGhostUpdate
 Event.on_nth_tick(updateRate, waterGhostUpdate)
 --add event handler for updateSettings
-Event.on_nth_tick(60, updateSettings)
+Event.on_nth_tick(constants.settingsUpdateDelay, updateSettings)
 --add event handler for update blueprint shortcut using filter function
 Event.register(defines.events.on_lua_shortcut, updateBlueprint, function(event, shortcut)
     return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate"

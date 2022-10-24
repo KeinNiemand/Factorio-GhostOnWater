@@ -1,15 +1,14 @@
 --used landfill type setting
-
+local constants = require('modules/constants')
+local Table = require('__stdlib__/stdlib/utils/table')
 local isLandfillPaintingLoaded = mods["LandfillPainting"]
 
-local lanfillTypes = { "landfill" }
+local lanfillTypes = { constants.vanillaLandfill }
 
 if (isLandfillPaintingLoaded) then
-    table.insert(lanfillTypes, "dry-dirt")
-    table.insert(lanfillTypes, "dirt-4")
-    table.insert(lanfillTypes, "grass-1")
-    table.insert(lanfillTypes, "red-desert-1")
-    table.insert(lanfillTypes, "sand-3")
+    Table.each(constants.paintingWithLandfillLandfillTypes, function(landfillType)
+        table.insert(lanfillTypes, landfillType)
+    end)
 end
 
 
@@ -17,7 +16,7 @@ local usedLandfillType = {
     type = "string-setting",
     name = "WaterGhostUsedLandfillType",
     setting_type = "runtime-global",
-    default_value = "landfill",
+    default_value = constants.vanillaLandfill,
     allowed_values = lanfillTypes,
     localised_name = "Used Landfill Type",
     localised_description = "The type of landfill that will be placed under dummy entities"
@@ -29,7 +28,7 @@ local WaterGhostUpdateDelay = {
     type = "int-setting",
     name = "WaterGhostUpdateDelay",
     setting_type = "runtime-global",
-    default_value = 600,
+    default_value = constants.defaultUpdateDelay,
     minimum_value = 1,
     maximum_value = 3600,
     localised_name  = "Update Delay",
