@@ -7,26 +7,43 @@ local Geom2D = require('lib/Geom2D')
 
 local updateRate = 600
 
+--get all entity prototypes names whos name starts with constants.dummyPrefix
+local function fillWaterGhostTypes()
+    global.GhostOnWater.WaterGhostNames = table.filter(
+        table.map(game.entity_prototypes ,function(prototype) return prototype.name end),
+        function(name) return util.string_starts_with(name, constants.dummyPrefix) end)
+end
+
+local function onConfigurationChanged()
+    global.GhostOnWater = {}
+    global.GhostOnWater.WaterGhostNames = {}
+    fillWaterGhostTypes()
+end
+
 --function to check if a dummy entity prototype exists
 local function dummyEntityPrototypeExists(entityName)
     --check if the dummy entity prototype exists
-    local dummyEntityPrototype = game.entity_prototypes[constants.dummyPrefix .. entityName]
+    local dummyEntityPrototype = global.GhostOnWater.WaterGhostNames[constants.dummyPrefix .. entityName]
     return dummyEntityPrototype ~= nil
 end
 
 --split function above into multiple functions to make it more readable
 local function getWaterGhostEntities()
-    --get all ghosts
-    local ghosts = game.surfaces[1].find_entities_filtered{type = "entity-ghost" }
-    --loop through ghosts
+    --get all surfaces
+    local surfaces = game.surfaces
+    local ghosts = {}
 
-    --use table.filter to filter the ghosts table
-    local foundWaterGhostEntities = table.filter(ghosts, function(ghost)
-        local entityName = ghost.ghost_name
-        return util.string_starts_with(entityName , constants.dummyPrefix)
+    table.each(surfaces, function(surface)
+        --get all ghosts on the surface
+        local surfaceGhosts = surface.find_entities_filtered { type = 'entity-ghost',
+            ghost_name = global.GhostOnWater.WaterGhostNames }
+        --add all surface ghosts to the ghosts table no additional checks needed
+        table.each(surfaceGhosts, function(ghost)
+            table.insert(ghosts, ghost)
+        end)
     end)
 
-    return foundWaterGhostEntities
+    return ghosts
 end
 
 --function to get the original entity name from the dummy entity name
@@ -46,8 +63,7 @@ local function canPlaceOriginalEntity(originalEntityName, dummyEntity)
     --get direction
     local direction = dummyEntity.direction
     --check if the original entity can be placed
-    local canPlace = surface.can_place_entity{name = originalEntityName, position = position, direction = direction}
-    return canPlace
+    return surface.can_place_entity { name = originalEntityName, position = position, direction = direction }
 end
 
 --function that replaces all dummy entity ghosts with the original entity ghosts
@@ -58,37 +74,36 @@ local function replaceDummyEntityGhost(dummyEntity)
     --check if the original entity can be placed in the location and with the same direction of the dummy entity
     if canPlaceOriginalEntity(originalEntityName, dummyEntity) then
         --order upgrade (force, target)
-        dummyEntity.order_upgrade{force = dummyEntity.force, target = originalEntityName}
+        dummyEntity.order_upgrade { force = dummyEntity.force, target = originalEntityName }
     end
 end
-
 
 local function getTilesInBoundingBox(entity)
     local tiles = {}
     local surface = entity.surface
-    
-    --function inside function that gets the tiles in a bounding box and adds them to the tiles table
-    local addTilesFromBoundingBox = function (boundingBox)
-    local tilePositions = Geom2D.get_overlapping_tiles(boundingBox)
-    --tilePositions[x][y] tile position that overlap are true
-    
-    for x, yTable in pairs(tilePositions) do
-        for y, overlap in pairs(yTable) do
-            if overlap then
-                local tile = surface.get_tile(x, y)
-                table.insert(tiles, tile)
-            end
 
+    --function inside function that gets the tiles in a bounding box and adds them to the tiles table
+    local addTilesFromBoundingBox = function(boundingBox)
+        local tilePositions = Geom2D.get_overlapping_tiles(boundingBox)
+        --tilePositions[x][y] tile position that overlap are true
+
+        for x, yTable in pairs(tilePositions) do
+            for y, overlap in pairs(yTable) do
+                if overlap then
+                    local tile = surface.get_tile(x, y)
+                    table.insert(tiles, tile)
+                end
+
+            end
         end
-    end
     end
 
     local boundingBox = entity.bounding_box
     addTilesFromBoundingBox(boundingBox)
-    
+
     --local tiles = surface.find_tiles_filtered{area = boundingBox}
     --if secondary_bounding_box is not nil, get tiles in secondary_bounding_box and add them to the tiles table
-    
+
     if entity.secondary_bounding_box then
         local secondaryBoundingBox = entity.secondary_bounding_box
         addTilesFromBoundingBox(secondaryBoundingBox)
@@ -111,19 +126,18 @@ local function placeGhostLandfill(dummyEntity)
     local usedLandfillType = settings.global["WaterGhostUsedLandfillType"].value
     local surface = dummyEntity.surface
     local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
-    table.each (tilesUnderEntity, function(tile)
+    table.each(tilesUnderEntity, function(tile)
         --check if tile would collide with player
         if (not tile.collides_with("player-layer")) or tile.has_tile_ghost() then
             return
         end
-        surface.create_entity{name = "tile-ghost", position = tile.position, force = dummyEntity.force, inner_name = usedLandfillType}
+        surface.create_entity { name = "tile-ghost", position = tile.position, force = dummyEntity.force,
+            inner_name = usedLandfillType }
     end)
 end
 
-
-
 --Main function that turns dummy entity ghosts into normal entity ghosts after landfill has been placed
-local function waterGhostUpdate() 
+local function waterGhostUpdate()
     --get all dummy entity ghosts
     local waterGhostEntities = getWaterGhostEntities()
     --loop through dummy entity ghosts
@@ -143,15 +157,15 @@ local function updateSettings()
         if (previousUpdateRate == updateRate) then return end
 
         --remove the old event
-        Event.remove(previousUpdateRate*-1, waterGhostUpdate)
+        Event.remove(previousUpdateRate * -1, waterGhostUpdate)
         Event.on_nth_tick(updateRate, waterGhostUpdate)
 
     else
         game.print("WaterGhostUpdateRate setting not found")
         return
     end
-    
-    
+
+
 end
 
 local function updateBlueprint(event)
@@ -182,13 +196,14 @@ local function updateBlueprint(event)
 
 end
 
-
-
+--on configuration changed event
+Event.on_configuration_changed(onConfigurationChanged)
 --add event handler for waterGhostUpdate
 Event.on_nth_tick(updateRate, waterGhostUpdate)
 --add event handler for updateSettings
 Event.on_nth_tick(60, updateSettings)
 --add event handler for update blueprint shortcut using filter function
-Event.register(defines.events.on_lua_shortcut, updateBlueprint , function(event, shortcut)
-    return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate" end, "")
-Event.register("InputWaterGhostBlueprintUpdate"  , updateBlueprint)
+Event.register(defines.events.on_lua_shortcut, updateBlueprint, function(event, shortcut)
+    return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate"
+end, "")
+Event.register("InputWaterGhostBlueprintUpdate", updateBlueprint)
