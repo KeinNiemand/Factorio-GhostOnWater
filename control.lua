@@ -136,11 +136,14 @@ local function waterGhostUpdate()
 end
 
 local function updateSettings()
-    Event.remove(updateRate, waterGhostUpdate)
     if (settings.global["WaterGhostUpdateDelay"]) then
         local previousUpdateRate = updateRate
         updateRate = settings.global["WaterGhostUpdateDelay"].value
+        --don't do anything if the update rate hasn't changed
         if (previousUpdateRate == updateRate) then return end
+
+        --remove the old event
+        Event.remove(previousUpdateRate*-1, waterGhostUpdate)
         Event.on_nth_tick(updateRate, waterGhostUpdate)
 
     else
