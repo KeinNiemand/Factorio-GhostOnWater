@@ -3,6 +3,8 @@ local Event = require('__stdlib__/stdlib/event/event')
 local util = require('util')
 local table = require('__stdlib__/stdlib/utils/table')
 local Inventory = require('__stdlib__/stdlib/entity/inventory')
+local Area = require('__stdlib__/stdlib/area/area')
+local Geom2D = require('lib/Geom2D')
 
 --function to check if a dummy entity prototype exists
 local function dummyEntityPrototypeExists(entityName)
@@ -59,17 +61,45 @@ local function replaceDummyEntityGhost(dummyEntity)
     end
 end
 
+
 local function getTilesInBoundingBox(entity)
+    local tiles = {}
     local surface = entity.surface
+    
+    --function inside function that gets the tiles in a bounding box and adds them to the tiles table
+    local addTilesFromBoundingBox = function (boundingBox)
+    local tilePositions = Geom2D.get_overlapping_tiles(boundingBox)
+    --tilePositions[x][y] tile position that overlap are true
+    
+    for x, yTable in pairs(tilePositions) do
+        for y, overlap in pairs(yTable) do
+            if overlap then
+                local tile = surface.get_tile(x, y)
+                table.insert(tiles, tile)
+            end
+
+        end
+    end
+    end
+
     local boundingBox = entity.bounding_box
-    local tiles = surface.find_tiles_filtered{area = boundingBox}
+    addTilesFromBoundingBox(boundingBox)
+    
+    --local tiles = surface.find_tiles_filtered{area = boundingBox}
     --if secondary_bounding_box is not nil, get tiles in secondary_bounding_box and add them to the tiles table
+    
     if entity.secondary_bounding_box then
         local secondaryBoundingBox = entity.secondary_bounding_box
-        local secondaryTiles = surface.find_tiles_filtered{area = secondaryBoundingBox}
-        table.each(secondaryTiles, function(tile)
-            table.insert(tiles, tile)
-        end)
+        addTilesFromBoundingBox(secondaryBoundingBox)
+        --take boundingbox.oriantation into account
+        --local orientation = entity.orientation
+        --get the bounding box of the secondary bounding box
+        --local secondaryBoundingBox = Area.getRotatedBoundingBoxes(secondaryBoundingBox, orientation)
+
+        --local secondaryTiles = surface.find_tiles_filtered{area = secondaryBoundingBox}
+        --table.each(secondaryTiles, function(tile)
+        --    table.insert(tiles, tile)
+        --end)
     end
     return tiles
 end
