@@ -137,7 +137,7 @@ end
 
 
 --add event handler for on_tick
-Event.on_nth_tick(60, waterGhostUpdate)
+Event.on_nth_tick(600, waterGhostUpdate)
 --add event handler for update blueprint shortcut using filter function
 Event.register(defines.events.on_lua_shortcut, updateBlueprint , function(event, shortcut)
     return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate" end, "")
