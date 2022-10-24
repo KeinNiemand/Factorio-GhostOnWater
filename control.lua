@@ -5,14 +5,14 @@ local table = require('__stdlib__/stdlib/utils/table')
 local Inventory = require('__stdlib__/stdlib/entity/inventory')
 
 --function to check if a dummy entity prototype exists
-function dummyEntityPrototypeExists(entityName)
+local function dummyEntityPrototypeExists(entityName)
     --check if the dummy entity prototype exists
     local dummyEntityPrototype = game.entity_prototypes[constants.dummyPrefix .. entityName]
     return dummyEntityPrototype ~= nil
 end
 
 --split function above into multiple functions to make it more readable
-function getWaterGhostEntities()
+local function getWaterGhostEntities()
     --get all ghosts
     local ghosts = game.surfaces[1].find_entities_filtered{type = "entity-ghost" }
     --loop through ghosts
@@ -27,14 +27,14 @@ function getWaterGhostEntities()
 end
 
 --function to get the original entity name from the dummy entity name
-function getOriginalEntityName(dummyEntityName)
+local function getOriginalEntityName(dummyEntityName)
     --get the original entity name from the dummy entity name
     local originalEntityName = string.sub(dummyEntityName, string.len(constants.dummyPrefix) + 1)
     return originalEntityName
 end
 
 --function that check if the original entity could be placed in the location of the dummy entity
-function canPlaceOriginalEntity(originalEntityName, dummyEntity)
+local function canPlaceOriginalEntity(originalEntityName, dummyEntity)
     --check if the original entity can be placed in the location and with the same direction of the dummy entity
     --get surface
     local surface = dummyEntity.surface
@@ -49,7 +49,7 @@ end
 
 --function that replaces all dummy entity ghosts with the original entity ghosts
 --use orderUpgrade to upgrade the dummy entity ghosts to the original entity ghosts
-function replaceDummyEntityGhost(dummyEntity)
+local function replaceDummyEntityGhost(dummyEntity)
     --get the original entity name from the dummy entity name
     local originalEntityName = getOriginalEntityName(dummyEntity.ghost_name)
     --check if the original entity can be placed in the location and with the same direction of the dummy entity
@@ -59,23 +59,7 @@ function replaceDummyEntityGhost(dummyEntity)
     end
 end
 
---function that places ghost landfill under dummy entity ghosts
-function placeGhostLandfill(dummyEntity)
-    --get landfill type from settings
-    local usedLandfillType = settings.global["usedLandfillType"].value
-    local surface = dummyEntity.surface
-    local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
-    table.each (tilesUnderEntity, function(tile)
-        --check if tile would collide with player
-        if (not tile.collides_with("player-layer")) or tile.has_tile_ghost() then
-            return
-        end
-        surface.create_entity{name = "tile-ghost", position = tile.position, force = dummyEntity.force, inner_name = usedLandfillType}
-    end)
-end
-
---function that gets tiles in the bounding box of an entity
-function getTilesInBoundingBox(entity)
+local function getTilesInBoundingBox(entity)
     local surface = entity.surface
     local boundingBox = entity.bounding_box
     local tiles = surface.find_tiles_filtered{area = boundingBox}
@@ -90,8 +74,26 @@ function getTilesInBoundingBox(entity)
     return tiles
 end
 
+--function that places ghost landfill under dummy entity ghosts
+local function placeGhostLandfill(dummyEntity)
+    --get landfill type from settings
+    local usedLandfillType = settings.global["usedLandfillType"].value
+    local surface = dummyEntity.surface
+    local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
+    table.each (tilesUnderEntity, function(tile)
+        --check if tile would collide with player
+        if (not tile.collides_with("player-layer")) or tile.has_tile_ghost() then
+            return
+        end
+        surface.create_entity{name = "tile-ghost", position = tile.position, force = dummyEntity.force, inner_name = usedLandfillType}
+    end)
+end
+
+--function that gets tiles in the bounding box of an entity
+
+
 --Main function that turns dummy entity ghosts into normal entity ghosts after landfill has been placed
-function waterGhostUpdate() 
+local function waterGhostUpdate() 
     --get all dummy entity ghosts
     local waterGhostEntities = getWaterGhostEntities()
     --loop through dummy entity ghosts
@@ -104,7 +106,7 @@ function waterGhostUpdate()
 end
 
 
-function updateBlueprint(event)
+local function updateBlueprint(event)
     --get the player
     local player = game.players[event.player_index]
     --check if the player has a blueprint selected return if not
