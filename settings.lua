@@ -25,7 +25,7 @@ local usedLandfillType = {
 
 data:extend({ usedLandfillType })
 
-local updateDelay = {
+local WaterGhostUpdateDelay = {
     type = "int-setting",
     name = "WaterGhostUpdateDelay",
     setting_type = "runtime-global",
@@ -35,3 +35,5 @@ local updateDelay = {
     localised_name  = "Update Delay",
     localised_description = "Delay between water ghost (dummy) entiy updates in ticks.\nWater ghost entitie updates are performace heavy and may cause lag spikes.\nHigher values reduce the amount of updates and reduce lag spikes.\nLower values increase the amount of updates and increase lag spikes.\nIf you experience lag spikes, increase this value to make them less frequent.",
 }
+
+data:extend({ WaterGhostUpdateDelay })

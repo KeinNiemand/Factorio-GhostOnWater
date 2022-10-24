@@ -150,6 +150,11 @@ local function createDummyItem(originalItem)
             then
                 dummyItem.curved_rail = constants.dummyPrefix .. originalItem.curved_rail
             end
+
+            --set item group to dummy item group
+            dummyItem.group = constants.dummyPrefix
+            --set item subgroup to nil
+            dummyItem.subgroup = nil
             
             return dummyItem
 end

@@ -3,8 +3,9 @@ local Event = require('__stdlib__/stdlib/event/event')
 local util = require('util')
 local table = require('__stdlib__/stdlib/utils/table')
 local Inventory = require('__stdlib__/stdlib/entity/inventory')
-local Area = require('__stdlib__/stdlib/area/area')
 local Geom2D = require('lib/Geom2D')
+
+local updateRate = 600
 
 --function to check if a dummy entity prototype exists
 local function dummyEntityPrototypeExists(entityName)
@@ -119,7 +120,6 @@ local function placeGhostLandfill(dummyEntity)
     end)
 end
 
---function that gets tiles in the bounding box of an entity
 
 
 --Main function that turns dummy entity ghosts into normal entity ghosts after landfill has been placed
@@ -135,6 +135,21 @@ local function waterGhostUpdate()
     end
 end
 
+local function updateSettings()
+    Event.remove(updateRate, waterGhostUpdate)
+    if (settings.global["WaterGhostUpdateDelay"]) then
+        local previousUpdateRate = updateRate
+        updateRate = settings.global["WaterGhostUpdateDelay"].value
+        if (previousUpdateRate == updateRate) then return end
+        Event.on_nth_tick(updateRate, waterGhostUpdate)
+
+    else
+        game.print("WaterGhostUpdateRate setting not found")
+        return
+    end
+    
+    
+end
 
 local function updateBlueprint(event)
     --get the player
@@ -166,8 +181,10 @@ end
 
 
 
---add event handler for on_tick
-Event.on_nth_tick(settings.global.WaterGhostUpdateDelay, waterGhostUpdate)
+--add event handler for waterGhostUpdate
+Event.on_nth_tick(updateRate, waterGhostUpdate)
+--add event handler for updateSettings
+Event.on_nth_tick(60, updateSettings)
 --add event handler for update blueprint shortcut using filter function
 Event.register(defines.events.on_lua_shortcut, updateBlueprint , function(event, shortcut)
     return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate" end, "")
