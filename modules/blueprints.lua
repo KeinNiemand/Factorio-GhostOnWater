@@ -1,8 +1,15 @@
 ---This Module is responsible for updating blueprints and repacle their contents with dummy water ghost entity_prototypes
 local blueprints = {}
+local constants = require('modules/constants')
 local Inventory = require('__stdlib__/stdlib/entity/inventory')
 local table = require('__stdlib__/stdlib/utils/table')
 
+--function to check if a dummy entity prototype exists
+local function dummyEntityPrototypeExists(entityName)
+    --check if the dummy entity prototype exists
+    local dummyEntityPrototype = global.GhostOnWater.WaterGhostNames[constants.dummyPrefix .. entityName]
+    return dummyEntityPrototype ~= nil
+end
 
 blueprints.updateBlueprint = function(playerIndex)
     --get the player
@@ -12,6 +19,8 @@ blueprints.updateBlueprint = function(playerIndex)
 
     --check if player is really holding a blueprint item stack
     local blueprintStack = player.cursor_stack
+    --Return if blueprintStack is null or not valid_for_read
+    if not blueprintStack then return end
     if not blueprintStack.valid_for_read then return end
     --get blueprint entities
     local blueprintEntities = player.get_blueprint_entities()
@@ -31,3 +40,5 @@ blueprints.updateBlueprint = function(playerIndex)
     blueprint.set_blueprint_entities(dummyEntities)
 
 end
+
+return blueprints
