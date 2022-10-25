@@ -1,3 +1,5 @@
+--require
+
 local constants = require('modules/constants')
 local Event = require('__stdlib__/stdlib/event/event')
 local util = require('util')
@@ -15,9 +17,12 @@ local function fillWaterGhostTypes()
         function(name) return util.string_starts_with(name, constants.dummyPrefix) end)
 end
 
+--re initilises data global table
 local function onConfigurationChanged()
-    global.GhostOnWater = {}
-    global.GhostOnWater.WaterGhostNames = {}
+    global.GhostOnWater = 
+    {
+        WaterGhostNames = {}
+    }
     fillWaterGhostTypes()
 end
 
@@ -34,6 +39,7 @@ local function waterGhostUpdate()
     end
 end
 
+--checks if runtime mod settings that need to be applied changed and applies them
 local function updateSettings()
     if (settings.global["WaterGhostUpdateDelay"]) then
         local previousUpdateRate = updateRate
@@ -54,6 +60,7 @@ local function updateSettings()
 
 end
 
+--runs when user triggers a blueprint update with the shortcut or hotkey
 local function onBlueprintUpdateTriggerd(event)
     local playerIndex = event.player_index
     blueprints.updateBlueprint(playerIndex)
