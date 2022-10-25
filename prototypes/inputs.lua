@@ -1,5 +1,5 @@
---contains custom input definitions and custom shortcut definitions or any other type of input
-local shortcut = {
+--add shortcut to make blueprint water placable
+data:extend{
     type = "shortcut",
     action = "lua",
     name = "ShortcutWaterGhostBlueprintUpdate",
@@ -9,18 +9,38 @@ local shortcut = {
         scale = 1,
         flags = {"icon"}
     },
+    localised_name = "Convert Blueprint to water placable"
+}
+--add shortcut to reverse bp
+data:extend{
+    type = "shortcut",
+    action = "lua",
+    name = "ShortcutWaterGhostBlueprintRevert",
+    icon = {
+        filename = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png",
+        size = 16,
+        scale = 1,
+        flags = {"icon"}
+    },
+    localised_name = "Revert Water Placable Blueprint"
 }
 
 --add custom input
-local customInput = {
+data:extend{
     name = "InputWaterGhostBlueprintUpdate",
     type = "custom-input",
     key_sequence = "CONTROL + W",
     consuming = "none",
-    action = "lua"
+    action = "lua",
+    localised_name = "Convert Blueprint to water placable Hotkey"
 }
 
---add shortcut to the toolbar
-data:extend{shortcut}
---add custom input
-data:extend{customInput}
+data:extend{
+    name = "InputWaterGhostBlueprintRevert",
+    type = "custom-input",
+    --control shift w
+    key_sequence = "CONTROL + SHIFT + W",
+    consuming = "none",
+    action = "lua",
+    localised_name = "Revert Water Placable Blueprint Hotkey"
+}

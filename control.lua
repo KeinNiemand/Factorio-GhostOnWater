@@ -63,7 +63,12 @@ end
 --runs when user triggers a blueprint update with the shortcut or hotkey
 local function onBlueprintUpdateTriggerd(event)
     local playerIndex = event.player_index
-    blueprints.updateBlueprint(playerIndex)
+    blueprints.updateBlueprint(playerIndex, blueprints.bpReplacerToDummy)
+end
+
+local function onBlueprintRevertTriggerd(event)
+    local playerIndex = event.player_index
+    blueprints.updateBlueprint(playerIndex, blueprints.bpReplacerToOriginal)
 end
 
 --on configuration changed event
@@ -76,4 +81,10 @@ Event.on_nth_tick(constants.settingsUpdateDelay, updateSettings)
 Event.register(defines.events.on_lua_shortcut, onBlueprintUpdateTriggerd, function(event, shortcut)
     return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate"
 end, "")
+--add event handler for update blueprint hotkey
 Event.register("InputWaterGhostBlueprintUpdate", onBlueprintUpdateTriggerd)
+--add event handler for revert blueprint shortcut using filter function
+Event.register(defines.events.on_lua_shortcut, onBlueprintRevertTriggerd, function(event, shortcut)
+    return event.prototype_name == "ShortcutWaterGhostBlueprintRevert"
+end, "")
+Event.register("InputWaterGhostBlueprintUpdate", onBlueprintRevertTriggerd)

@@ -6,7 +6,7 @@ local Inventory = require('__stdlib__/stdlib/entity/inventory')
 local table = require('__stdlib__/stdlib/utils/table')
 
 
-blueprints.updateBlueprint = function(playerIndex)
+blueprints.updateBlueprint = function(playerIndex, replacerFunction)
     --get the player
     local player = game.players[playerIndex]
     --check if the player has a blueprint selected return if not
@@ -21,19 +21,26 @@ blueprints.updateBlueprint = function(playerIndex)
     local blueprintEntities = player.get_blueprint_entities()
 
     --replace blueprint entities with dummy entities using table.map
-    local dummyEntities = table.map(blueprintEntities, function(entity)
-        if (waterGhostCommon.dummyEntityPrototypeExists(entity.name)) then
-            --replace entity with dummy entity
-            entity.name = constants.dummyPrefix .. entity.name
-        end
-        return entity
-    end)
+    local dummyEntities = table.map(blueprintEntities, replacerFunction)
 
     --set the blueprint entities
     local itemStack = player.cursor_stack
     local blueprint = Inventory.get_blueprint(itemStack)
     blueprint.set_blueprint_entities(dummyEntities)
 
+end
+
+blueprints.bpReplacerToDummy = function(entity)
+    if (waterGhostCommon.dummyEntityPrototypeExists(entity.name)) then
+        --replace entity with dummy entity
+        entity.name = constants.dummyPrefix .. entity.name
+    end
+    return entity
+end
+
+blueprints.bpReplacerToOriginal = function(entity) 
+    entity.name = waterGhostCommon.getOriginalEntityName(entity.name)
+    return entity
 end
 
 return blueprints
