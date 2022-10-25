@@ -5,25 +5,25 @@ local table = require('__stdlib__/stdlib/utils/table')
 local Inventory = require('__stdlib__/stdlib/entity/inventory')
 local Geom2D = require('lib/Geom2D')
 
-local updateRate = 600
+local updateRate = constants.defaultUpdateDelay
 
---get all entity prototypes names whos name starts with constants.dudummyPrefix
+--get all entity prototypes names whos name starts with constants.dummyPrefix
 local function fillWaterGhostTypes()
-    global.GhostOnWater.WaterGhostTypes = table.filter(
+    global.GhostOnWater.WaterGhostNames = table.filter(
         table.map(game.entity_prototypes ,function(prototype) return prototype.name end),
-        function(name) return util.string_starts_with(name, constants.dudummyPrefix) end)
+        function(name) return util.string_starts_with(name, constants.dummyPrefix) end)
 end
 
 local function onConfigurationChanged()
     global.GhostOnWater = {}
-    global.GhostOnWater.WaterGhostTypes = {}
+    global.GhostOnWater.WaterGhostNames = {}
     fillWaterGhostTypes()
 end
 
 --function to check if a dummy entity prototype exists
 local function dummyEntityPrototypeExists(entityName)
     --check if the dummy entity prototype exists
-    local dummyEntityPrototype = game.entity_prototypes[constants.dummyPrefix .. entityName]
+    local dummyEntityPrototype = global.GhostOnWater.WaterGhostNames[constants.dummyPrefix .. entityName]
     return dummyEntityPrototype ~= nil
 end
 
@@ -36,21 +36,14 @@ local function getWaterGhostEntities()
     table.each(surfaces, function(surface)
         --get all ghosts on the surface
         local surfaceGhosts = surface.find_entities_filtered { type = 'entity-ghost',
-            ghost_type = global.GhostOnWater.WaterGhostTypes }
+            ghost_name = global.GhostOnWater.WaterGhostNames }
         --add all surface ghosts to the ghosts table no additional checks needed
         table.each(surfaceGhosts, function(ghost)
             table.insert(ghosts, ghost)
         end)
     end)
-    --loop through ghosts
 
-    --use table.filter to filter the ghosts table
-    local foundWaterGhostEntities = table.filter(ghosts, function(ghost)
-        local entityName = ghost.ghost_name
-        return util.string_starts_with(entityName, constants.dummyPrefix)
-    end)
-
-    return foundWaterGhostEntities
+    return ghosts
 end
 
 --function to get the original entity name from the dummy entity name
@@ -70,8 +63,7 @@ local function canPlaceOriginalEntity(originalEntityName, dummyEntity)
     --get direction
     local direction = dummyEntity.direction
     --check if the original entity can be placed
-    local canPlace = surface.can_place_entity { name = originalEntityName, position = position, direction = direction }
-    return canPlace
+    return surface.can_place_entity { name = originalEntityName, position = position, direction = direction }
 end
 
 --function that replaces all dummy entity ghosts with the original entity ghosts
@@ -209,7 +201,7 @@ Event.on_configuration_changed(onConfigurationChanged)
 --add event handler for waterGhostUpdate
 Event.on_nth_tick(updateRate, waterGhostUpdate)
 --add event handler for updateSettings
-Event.on_nth_tick(60, updateSettings)
+Event.on_nth_tick(constants.settingsUpdateDelay, updateSettings)
 --add event handler for update blueprint shortcut using filter function
 Event.register(defines.events.on_lua_shortcut, updateBlueprint, function(event, shortcut)
     return event.prototype_name == "ShortcutWaterGhostBlueprintUpdate"

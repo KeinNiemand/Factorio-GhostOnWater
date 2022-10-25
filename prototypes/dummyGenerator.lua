@@ -93,14 +93,14 @@ local function createDummyEntity(originalEntity)
     table.insert(dummyEntity.flags, "hidden")
 
     --remove the not-upgradable flag from the flags table
-    table.remove(dummyEntity.flags, table.indexOf(dummyEntity.flags, "not-upgradable"))
-
+    --table.remove(dummyEntity.flags, table.indexOf(dummyEntity.flags, "not-upgradable"))
 
     --check if next-upgrade exists
-    if dummyEntity.next_upgrade then
+    --if dummyEntity.next_upgrade then
     --set the next_upgrade of the dummy prototype to dummyPrefix .. next_upgrade
-        dummyEntity.next_upgrade = constants.dummyPrefix .. dummyEntity.next_upgrade
-    end
+   --     dummyEntity.next_upgrade = constants.dummyPrefix .. dummyEntity.next_upgrade
+    --end
+    dummyEntity.next_upgrade = nil
 
     --if the entity is minable, remove the mining result
     if dummyEntity.minable then
@@ -155,6 +155,11 @@ local function createDummyItem(originalItem)
             dummyItem.group = constants.dummyPrefix
             --set item subgroup to nil
             dummyItem.subgroup = nil
+
+            if dummyItem.flags == nil then
+                dummyItem.flags = {}
+            end
+            table.insert(dummyItem.flags, "hidden")
             
             return dummyItem
 end
