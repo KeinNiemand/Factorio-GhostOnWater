@@ -18,7 +18,7 @@ local function fillWaterGhostTypes()
 end
 
 --re initilises data global table
-local function onConfigurationChanged()
+local function reInitGlobalTable()
     global.GhostOnWater = 
     {
         WaterGhostNames = {}
@@ -75,7 +75,8 @@ local function onBlueprintRevertTriggerd(event)
 end
 
 --on configuration changed event
-Event.on_configuration_changed(onConfigurationChanged)
+Event.on_configuration_changed(reInitGlobalTable)
+Event.on_init(reInitGlobalTable)
 --add event handler for waterGhostUpdate
 Event.on_nth_tick(updateRate, waterGhostUpdate)
 --add event handler for updateSettings
