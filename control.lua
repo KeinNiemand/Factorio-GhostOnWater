@@ -28,6 +28,9 @@ end
 
 --Main function that turns dummy entity ghosts into normal entity ghosts after landfill has been placed
 local function waterGhostUpdate()
+    --return if global table is not initialised
+    if not global.GhostOnWater then return end
+
     --get all dummy entity ghosts
     local waterGhostEntities = waterGhostUpdater.getWaterGhostEntities()
     --loop through dummy entity ghosts
