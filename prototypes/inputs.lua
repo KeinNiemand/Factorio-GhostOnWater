@@ -1,5 +1,5 @@
 --add shortcut to make blueprint water placable
-data:extend{
+data:extend{{
     type = "shortcut",
     action = "lua",
     name = "ShortcutWaterGhostBlueprintUpdate",
@@ -9,10 +9,10 @@ data:extend{
         scale = 1,
         flags = {"icon"}
     },
-    localised_name = "Convert Blueprint to water placable"
-}
+    localised_name = "Make blueprint water placable"
+}}
 --add shortcut to reverse bp
-data:extend{
+data:extend{{
     type = "shortcut",
     action = "lua",
     name = "ShortcutWaterGhostBlueprintRevert",
@@ -23,24 +23,24 @@ data:extend{
         flags = {"icon"}
     },
     localised_name = "Revert Water Placable Blueprint"
-}
+}}
 
 --add custom input
-data:extend{
+data:extend{{
     name = "InputWaterGhostBlueprintUpdate",
     type = "custom-input",
     key_sequence = "CONTROL + W",
     consuming = "none",
     action = "lua",
-    localised_name = "Convert Blueprint to water placable Hotkey"
-}
+    localised_name = "Make blueprint water placable"
+}}
 
-data:extend{
+data:extend{{
     name = "InputWaterGhostBlueprintRevert",
     type = "custom-input",
     --control shift w
     key_sequence = "CONTROL + SHIFT + W",
     consuming = "none",
     action = "lua",
-    localised_name = "Revert Water Placable Blueprint Hotkey"
-}
+    localised_name = "Revert water placable blueprint"
+}}

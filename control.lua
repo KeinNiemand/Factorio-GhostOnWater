@@ -87,4 +87,4 @@ Event.register("InputWaterGhostBlueprintUpdate", onBlueprintUpdateTriggerd)
 Event.register(defines.events.on_lua_shortcut, onBlueprintRevertTriggerd, function(event, shortcut)
     return event.prototype_name == "ShortcutWaterGhostBlueprintRevert"
 end, "")
-Event.register("InputWaterGhostBlueprintUpdate", onBlueprintRevertTriggerd)
+Event.register("InputWaterGhostBlueprintRevert", onBlueprintRevertTriggerd)
