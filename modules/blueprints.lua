@@ -19,8 +19,11 @@ blueprints.updateBlueprint = function(playerIndex, replacerFunction)
     if not blueprintStack.valid_for_read then return end
     --get blueprint entities
     local blueprintEntities = player.get_blueprint_entities()
-
+    if not blueprintEntities then return end
+    --return if blueprintEntities is empty
+    if # blueprintEntities == 0 then return end
     --replace blueprint entities with dummy entities using table.map
+    
     local dummyEntities = table.map(blueprintEntities, replacerFunction)
 
     --set the blueprint entities
