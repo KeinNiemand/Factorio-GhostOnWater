@@ -2,6 +2,7 @@
 local constants = require('modules/constants')
 local Table = require('__stdlib__/stdlib/utils/table')
 local isLandfillPaintingLoaded = mods["LandfillPainting"]
+local isSpaceExplorationLoaded = mods["space-exploration"]
 
 local lanfillTypes = { constants.vanillaLandfill }
 
@@ -36,3 +37,16 @@ local WaterGhostUpdateDelay = {
 }
 
 data:extend({ WaterGhostUpdateDelay })
+
+if (isSpaceExplorationLoaded) then
+    data:extend
+    { {
+        type = "string-setting",
+        name = "WaterGhostUsedSpaceLandfillType",
+        setting_type = "runtime-global",
+        default_value = constants.spaceLandfillTypes[1],
+        allowed_values = constants.spaceLandfillTypes,  
+        localised_name = "Used Space Platform",
+        localised_description = "The type of space platform that will be placed under dummy entities placed on empty space"
+    } }
+end

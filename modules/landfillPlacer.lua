@@ -7,6 +7,22 @@ local Is = require('__stdlib__/stdlib/utils/is')
 local waterGhostCommon = require('modules/waterGhostCommon')
 
 local pumpLandfillOnCollisonMask = { "water-tile" }
+--for space exploration compatibility
+
+
+local function getLandfillTypeForCollision()
+    local emptySpaceTileCollisionLayerPrototype = game.entity_prototypes["collision-mask-empty-space-tile"]
+    local landfillTpyeForCollision = {} 
+    landfillTpyeForCollision["water-tile"] = settings.global.WaterGhostUsedLandfillType.value
+    --landfillTpyeForCollision["player-layer"] = settings.global.WaterGhostUsedLandfillType.value
+
+    if emptySpaceTileCollisionLayerPrototype then
+        local emptySpaceCollsion = table.first(table.keys(emptySpaceTileCollisionLayerPrototype.collision_mask))
+        landfillTpyeForCollision[emptySpaceCollsion] = settings.global.WaterGhostUsedSpaceLandfillType.value
+    end
+
+    return landfillTpyeForCollision
+end
 
 local function getTilesInBoundingBox(entity)
     local tiles = {}
@@ -86,17 +102,22 @@ end
 --function that places ghost landfill under dummy entity ghosts
 landfillPlacer.placeGhostLandfill = function(dummyEntity)
     --get landfill type from settings
-    local usedLandfillType = settings.global["WaterGhostUsedLandfillType"].value
     local surface = dummyEntity.surface
     local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
+    local landFillForCollision = getLandfillTypeForCollision()
     table.each(tilesUnderEntity, function(tile)
-        --check if tile would collide with player
-        if (not tile.collides_with("player-layer")) or tile.has_tile_ghost() then
+        --check if tile would collide with player or water-tile
+        if tile.has_tile_ghost() or not table.any(landFillForCollision, function(lanfill, collsionLayer) return tile.collides_with(collsionLayer) end) then
             return
         end
+
+        local usedLandfillType = table.find(landFillForCollision, function(lanfill, collsionLayer) return tile.collides_with(collsionLayer) end)
+
         surface.create_entity { name = "tile-ghost", position = tile.position, force = dummyEntity.force,
             inner_name = usedLandfillType }
     end)
 end
+
+
 
 return landfillPlacer

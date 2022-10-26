@@ -17,6 +17,7 @@ if (mods ["space-exploration"]) then
         ["object-layer"] = ""
     }
     --consider empty space as water so it also gets removed
+---@diagnostic disable-next-line: undefined-global
     mask_util.add_layer(waterCollisionMask, empty_space_collision_layer)
 end
 
