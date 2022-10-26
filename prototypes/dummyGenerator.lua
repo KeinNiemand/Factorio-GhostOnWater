@@ -3,8 +3,31 @@ local mask_util = require("collision-mask-util")
 local util = require("util")
 local Is = require('__stdlib__/stdlib/utils/is')
 local table = require('__stdlib__/stdlib/utils/table')
-local waterTileCollisionMask = data.raw["tile"]["water"].collision_mask
+local waterTileCollisionMask = table.deepcopy(data.raw["tile"]["water"].collision_mask)
+-- collison masks that have to be removed from the collision mask of the dummy entity but are
+-- required to collide with other entites so entities can be placed on top of themselves/other entities
+-- for compatibility with space exploration
+--a new layer gets added to dummy entites + any original entity that has a collision mask that contains any of these layers
+local specialRemovalCollsionMask = {}
 
+--space exploration compatibility
+if (mods ["space-exploration"]) then
+    specialRemovalCollsionMask = {
+        ["object-layer"] = ""
+    }
+
+    --consider empty space as water so it also gets removed
+    mask_util.add_layer(waterTileCollisionMask, empty_space_collision_layer)
+
+end
+
+--generate table with all entity prototypes
+local entityTable = {}
+for type in pairs(defines.prototypes.entity) do
+    for _, prototype in pairs(data.raw[type]) do
+        entityTable[prototype.name] = prototype
+    end
+end
 
 local dummyGenerator = {}
 
@@ -36,15 +59,34 @@ function table.indexOf(table, value)
     return nil
 end
 
---generate table with all entity prototypes
-local entityTable = {}
-for type in pairs(defines.prototypes.entity) do
-    for _, prototype in pairs(data.raw[type]) do
-        entityTable[prototype.name] = prototype
-    end
-end
+local function handleSpecialRemovalCollisonMask()
+    if Is.Empty(specialRemovalCollsionMask) then return end
+ 
+    table.each(specialRemovalCollsionMask, function(altLayer ,layer)
+         --get unused collision layer and store it in speical removal collision mask
+         if altLayer == "" then
+             altLayer = mask_util.get_first_unused_layer()
+             specialRemovalCollsionMask[layer] = altLayer
+         end
+ 
+         for _, prototype in pairs(entityTable) do
+            if not prototype then goto next end
 
-local function entityCollidesWithWaterLayer(entity)
+            if mask_util.mask_contains_layer(prototype.collision_mask, layer) then
+                --add alt layer to entity
+                mask_util.add_layer(prototype.collision_mask, altLayer)
+                --remove orignal layer if this is a dummy entity
+                if util.string_starts_with(prototype.name, constants.dummyEntityPrefix) then
+                    mask_util.remove_layer(prototype.collision_mask, layer)
+                end
+            end
+            ::next::
+         end
+    end)
+ end
+
+--checks if an entity collides with a collsion mask on any of it's layers
+local function entityCollidesWithMask(entity, colidesWithMask)
     --check if the entity has a collision_mask
     if entity == nil then
         return false
@@ -61,33 +103,34 @@ local function entityCollidesWithWaterLayer(entity)
     if mask then
         --check if the collision_mask contains the water layer
         --use serpent to print the table collision_mask
-        if mask_util.masks_collide(mask, waterTileCollisionMask) then
+        if mask_util.masks_collide(mask, colidesWithMask) then
             return true
         end
     end
     if mask2 then --Offshore pumps
-        if mask_util.masks_collide(mask2, waterTileCollisionMask) then
+        if mask_util.masks_collide(mask2, colidesWithMask) then
             return true
         end
     end
     if mask3 then --Offshore pumps
-        if mask_util.masks_collide(mask3, waterTileCollisionMask) then
+        if mask_util.masks_collide(mask3, colidesWithMask) then
             return true
         end
     end
     if test then  --Offshore pumps
-        if not mask_util.masks_collide(test, waterTileCollisionMask) then
+        if not mask_util.masks_collide(test, colidesWithMask) then
             return true
         end
     end
     if test2 then --Offshore pumps
-        if not mask_util.masks_collide(test2, waterTileCollisionMask) then
+        if not mask_util.masks_collide(test2, colidesWithMask) then
             return true
         end
     end
 	return false
 end
 
+--remove everything from mask that is in maskToRemove
 local function  removeCollisionMaskFromCollisonmask(mask, maskToRemove)
     for _, item in pairs(waterTileCollisionMask) do
         local index = table.indexOf(mask, item)
@@ -113,7 +156,7 @@ local function createDummyEntity(originalEntity)
     if originalMask2 then
         removeCollisionMaskFromCollisonmask(dummyEntity.adjacent_tile_collision_mask, waterTileCollisionMask)
     end
-    if originalMask2 then
+    if originalMask3 then
         removeCollisionMaskFromCollisonmask(dummyEntity.center_collision_mask, waterTileCollisionMask)
     end
     if originalTest then
@@ -225,7 +268,7 @@ dummyGenerator.GenerateDummyPrototypes = function()
     
     for name, prototypeItem in pairs(data.raw["item"]) do
         if prototypeItem.place_result then
-            if entityCollidesWithWaterLayer(entityTable[prototypeItem.place_result]) then
+            if entityCollidesWithMask(entityTable[prototypeItem.place_result], waterTileCollisionMask) then
                 local dummyItem = createDummyItem(prototypeItem)
                 data:extend({dummyItem})
                 local dummyEntity = createDummyEntity(entityTable[prototypeItem.place_result])
@@ -258,18 +301,21 @@ dummyGenerator.GenerateDummyPrototypes = function()
         local dummyItem = createDummyItem(prototypeRailPlaner)
         data:extend({dummyItem})
 
-        if entityCollidesWithWaterLayer(entityTable[prototypeRailPlaner.straight_rail]) then 
+        if entityCollidesWithMask(entityTable[prototypeRailPlaner.straight_rail]) then 
             local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.straight_rail])
             data:extend({dummyEntity})
         end
 
-        if entityCollidesWithWaterLayer(entityTable[prototypeRailPlaner.curved_rail]) then 
+        if entityCollidesWithMask(entityTable[prototypeRailPlaner.curved_rail]) then 
             local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.curved_rail])
             data:extend({dummyEntity})
         end
 
         ::continue::
     end
+
+    --handle special removals
+    handleSpecialRemovalCollisonMask()
 
 end
 
