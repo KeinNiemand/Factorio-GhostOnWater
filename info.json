@@ -4,6 +4,6 @@
     "title": "Ghost On Water",
     "author": "You",
     "factorio_version": "1.1",
-    "dependencies": ["base >= 1.1", "stdlib >= 1.4.7", "? LandfillPainting"],
+    "dependencies": ["base >= 1.1", "stdlib >= 1.4.7", "? LandfillPainting", "? space-exploration"],
     "description": "This mod adds the ability to place ghosts (trough blueprints) on water.\nUsage press control + w while holding a blueprint to make it placable on water, then simply place it on water."
   }
