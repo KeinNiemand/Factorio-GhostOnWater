@@ -52,17 +52,49 @@ local function entityCollidesWithWaterLayer(entity)
 
 
     local mask = mask_util.get_mask(entity)
+    --Offshore Pump
+    local mask2 = entity.adjacent_tile_collision_mask
+    local mask3 = entity.center_collision_mask
+    local test = entity.fluid_box_tile_collision_test
+    local test2 = entity.adjacent_tile_collision_test
 
-    if mask ~= nil then
+    if mask then
         --check if the collision_mask contains the water layer
         --use serpent to print the table collision_mask
         if mask_util.masks_collide(mask, waterTileCollisionMask) then
             return true
         end
-
     end
-
+    if mask2 then --Offshore pumps
+        if mask_util.masks_collide(mask2, waterTileCollisionMask) then
+            return true
+        end
+    end
+    if mask3 then --Offshore pumps
+        if mask_util.masks_collide(mask3, waterTileCollisionMask) then
+            return true
+        end
+    end
+    if test then  --Offshore pumps
+        if not mask_util.masks_collide(test, waterTileCollisionMask) then
+            return true
+        end
+    end
+    if test2 then --Offshore pumps
+        if not mask_util.masks_collide(test2, waterTileCollisionMask) then
+            return true
+        end
+    end
 	return false
+end
+
+local function  removeCollisionMaskFromCollisonmask(mask, maskToRemove)
+    for _, item in pairs(waterTileCollisionMask) do
+        local index = table.indexOf(mask, item)
+        if index ~= nil then
+            table.remove(mask, index)
+        end
+    end
 end
 
 local function createDummyEntity(originalEntity)
@@ -73,15 +105,40 @@ local function createDummyEntity(originalEntity)
         return nil
     end
 
+    --handle offshore pumps specific masks and tests 
+    local originalMask2 = dummyEntity.adjacent_tile_collision_mask
+    local originalMask3 = dummyEntity.center_collision_mask
+    local originalTest = dummyEntity.fluid_box_tile_collision_test
+    local originalTest2 = dummyEntity.adjacent_tile_collision_test
+    if originalMask2 then
+        removeCollisionMaskFromCollisonmask(dummyEntity.adjacent_tile_collision_mask, waterTileCollisionMask)
+    end
+    if originalMask2 then
+        removeCollisionMaskFromCollisonmask(dummyEntity.center_collision_mask, waterTileCollisionMask)
+    end
+    if originalTest then
+        if (not table.is_empty(originalTest)) and Is.Table(originalTest) then
+            mask_util.add_layer(dummyEntity.fluid_box_tile_collision_test, "water-tile")
+    elseif Is.String(originalTest) then
+            dummyEntity.fluid_box_tile_collision_test = "water-tile"
+        end
+
+    end
+    if originalTest2 then
+
+        --if originalTest2 is not empty 
+        if not table.is_empty(originalTest2) and Is.Table(originalTest2) then
+            mask_util.add_layer(originalTest2 ,"water-tile")
+        elseif Is.String(originalTest2) then
+            dummyEntity.adjacent_tile_collision_test = "water-tile"
+        end
+        
+    end
+
     --remove water-tile from collision mask
     dummyEntity.collision_mask = originalMask
     --remove all collsion mask items in water-tile-collsion-mask
-    for _, item in pairs(waterTileCollisionMask) do
-        local index = table.indexOf(dummyEntity.collision_mask, item)
-        if index ~= nil then
-            table.remove(dummyEntity.collision_mask, index)
-        end
-    end
+    removeCollisionMaskFromCollisonmask(dummyEntity.collision_mask, waterTileCollisionMask)
     
     --change the name of the dummy prototype to dummyPrefix .. name
     dummyEntity.name = constants.dummyPrefix .. dummyEntity.name

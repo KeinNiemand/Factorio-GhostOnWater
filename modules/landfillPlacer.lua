@@ -2,8 +2,11 @@
 local landfillPlacer = {}
 local Geom2D = require('lib/Geom2D')
 local table = require('__stdlib__/stdlib/utils/table')
+local Area = require('__stdlib__/stdlib/area/area')
+local Is = require('__stdlib__/stdlib/utils/is')
+local waterGhostCommon = require('modules/waterGhostCommon')
 
-
+local pumpLandfillOnCollisonMask = { "water-tile" }
 
 local function getTilesInBoundingBox(entity)
     local tiles = {}
@@ -25,9 +28,42 @@ local function getTilesInBoundingBox(entity)
         end
     end
 
-    local boundingBox = entity.bounding_box
-    addTilesFromBoundingBox(boundingBox)
+    --return if entity is not a valid entity
+    if (not Is.valid(entity)) then
+        return tiles
+    end
 
+    local boundingBox = entity.bounding_box
+
+    if entity.ghost_type == "offshore-pump" then
+
+
+
+        local  orignalName = waterGhostCommon.getOriginalEntityName(entity.ghost_name)
+        local prototype = game.entity_prototypes[orignalName]
+
+        if not prototype then return tiles end
+        --main bouding box contains both the part of the pump that is on land and the part that is on water
+        --add tile from main bounding box if it collides with water
+        if (table.any(pumpLandfillOnCollisonMask, function(mask)
+            return prototype.collision_mask[mask]
+        end)) then addTilesFromBoundingBox(boundingBox) end
+
+        --add tiles from center bounding box
+        --get the bounding box of the part of the pump that is on land
+            table.insert(tiles, surface.get_tile(entity.position.x, entity.position.y))
+
+        --add tiles from adjacent bounding boxe if the mask collides with water
+        if (table.any(pumpLandfillOnCollisonMask, function(mask)
+            return prototype.adjacent_tile_collision_mask[mask]
+        end)) then
+            local adjacentBoundingBox = Area.offset(prototype.adjacent_tile_collision_box, entity.position)
+            addTilesFromBoundingBox(adjacentBoundingBox)
+        end
+    else
+
+    addTilesFromBoundingBox(boundingBox)
+    end
     --local tiles = surface.find_tiles_filtered{area = boundingBox}
     --if secondary_bounding_box is not nil, get tiles in secondary_bounding_box and add them to the tiles table
 
