@@ -1,7 +1,7 @@
 local constants = {}
 
 constants.dummyPrefix = "waterGhost-"
-constants.defaultUpdateDelay = 69
+constants.defaultUpdateDelay = 42
 constants.defaultMaxWaterGhostUpdatesPerUpdate = 300
 constants.settingsUpdateDelay = 60
 constants.vanillaLandfill = "landfill"

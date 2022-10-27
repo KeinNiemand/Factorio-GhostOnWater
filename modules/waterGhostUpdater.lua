@@ -106,7 +106,7 @@ waterGhostUpdater.forceUpdateKnownWaterGhosts = function()
     global.GhostOnWater.KnownWaterGhosts = Queue()
     table.each(waterGhosts, function(ghost)
         --push every found water ghost onto the queue
-        global.GhostOnWater.KnownWaterGhosts({ghost = ghost, tiles = {}})
+        global.GhostOnWater.KnownWaterGhosts({ghost = ghost})
     end)
 end
 
@@ -118,7 +118,7 @@ waterGhostUpdater.addEntityToKnownWaterGhosts = function(entity)
     --check if the entity is a dummy entity
     --if util.string_starts_with(entity.ghost_name, constants.dummyPrefix) then
         --add the entity to the known water ghosts table
-    global.GhostOnWater.KnownWaterGhosts({ghost = entity, tiles = {}})
+    global.GhostOnWater.KnownWaterGhosts({ghost = entity})
     --end
 end
 
