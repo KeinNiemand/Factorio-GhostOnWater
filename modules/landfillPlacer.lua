@@ -11,14 +11,13 @@ local pumpLandfillOnCollisonMask = { "water-tile" }
 
 
 local function getLandfillTypeForCollision()
-    local emptySpaceTileCollisionLayerPrototype = game.entity_prototypes["collision-mask-empty-space-tile"]
+    --local emptySpaceTileCollisionLayerPrototype = game.entity_prototypes["collision-mask-empty-space-tile"]
     local landfillTpyeForCollision = {} 
     landfillTpyeForCollision["water-tile"] = settings.global.WaterGhostUsedLandfillType.value
     --landfillTpyeForCollision["player-layer"] = settings.global.WaterGhostUsedLandfillType.value
-
-    if emptySpaceTileCollisionLayerPrototype then
-        local emptySpaceCollsion = table.first(table.keys(emptySpaceTileCollisionLayerPrototype.collision_mask))
-        landfillTpyeForCollision[emptySpaceCollsion] = settings.global.WaterGhostUsedSpaceLandfillType.value
+    --add empty space collison if it exists for space exploration compatibility
+    if global.GhostOnWater.emptySpaceCollsion then
+        landfillTpyeForCollision["object-layer"] = settings.global.WaterGhostUsedSpaceLandfillType.value
     end
 
     return landfillTpyeForCollision
@@ -27,6 +26,17 @@ end
 local function getTilesInBoundingBox(entity)
     local tiles = {}
     local surface = entity.surface
+    local boundingBox = entity.bounding_box
+    
+    --if (prototype.collision_mask) then
+    --    collisionMask = prototype.collision_mask
+    --end
+
+    --local addColidingTile = function(tile)
+    --    if table.any(collisionMask, function(_ ,collision) return tile.collides_with(collision) end) then
+    --        table.insert(tiles, tile)
+    --    end
+    --end
 
     --function inside function that gets the tiles in a bounding box and adds them to the tiles table
     local addTilesFromBoundingBox = function(boundingBox)
@@ -39,7 +49,6 @@ local function getTilesInBoundingBox(entity)
                     local tile = surface.get_tile(x, y)
                     table.insert(tiles, tile)
                 end
-
             end
         end
     end
@@ -49,16 +58,18 @@ local function getTilesInBoundingBox(entity)
         return tiles
     end
 
-    local boundingBox = entity.bounding_box
-
     if entity.ghost_type == "offshore-pump" then
-
-
-
-        local  orignalName = waterGhostCommon.getOriginalEntityName(entity.ghost_name)
+        local orignalName = waterGhostCommon.getOriginalEntityName(entity.ghost_name)
         local prototype = game.entity_prototypes[orignalName]
-
         if not prototype then return tiles end
+
+        --if the entity has an adjacent_tile_collision_mask add it to the collision mask
+        --if prototype.adjacent_tile_collision_mask then
+        --    table.each(prototype.adjacent_tile_collision_mask,function(_ ,collision)
+        --        table.insert(collisionMask, collision)
+        --    end)
+        --end
+
         --main bouding box contains both the part of the pump that is on land and the part that is on water
         --add tile from main bounding box if it collides with water
         if (table.any(pumpLandfillOnCollisonMask, function(mask)
@@ -67,7 +78,7 @@ local function getTilesInBoundingBox(entity)
 
         --add tiles from center bounding box
         --get the bounding box of the part of the pump that is on land
-            table.insert(tiles, surface.get_tile(entity.position.x, entity.position.y))
+        table.insert(tiles, surface.get_tile(entity.position.x, entity.position.y))
 
         --add tiles from adjacent bounding boxe if the mask collides with water
         if (table.any(pumpLandfillOnCollisonMask, function(mask)
@@ -77,12 +88,10 @@ local function getTilesInBoundingBox(entity)
             addTilesFromBoundingBox(adjacentBoundingBox)
         end
     else
-
-    addTilesFromBoundingBox(boundingBox)
+        addTilesFromBoundingBox(boundingBox)
     end
-    --local tiles = surface.find_tiles_filtered{area = boundingBox}
-    --if secondary_bounding_box is not nil, get tiles in secondary_bounding_box and add them to the tiles table
 
+    --if secondary_bounding_box is not nil, get tiles in secondary_bounding_box and add them to the tiles table
     if entity.secondary_bounding_box then
         local secondaryBoundingBox = entity.secondary_bounding_box
         addTilesFromBoundingBox(secondaryBoundingBox)
@@ -96,25 +105,27 @@ local function getTilesInBoundingBox(entity)
         --    table.insert(tiles, tile)
         --end)
     end
+
+    
     return tiles
 end
 
 --function that places ghost landfill under dummy entity ghosts
-landfillPlacer.placeGhostLandfill = function(dummyEntity)
+landfillPlacer.placeGhostLandfill = function(dummyEntity, tiles)
     --get landfill type from settings
     local surface = dummyEntity.surface
-    local tilesUnderEntity = getTilesInBoundingBox(dummyEntity)
+    local tilesUnderEntity = tiles or getTilesInBoundingBox(dummyEntity)
     local landFillForCollision = getLandfillTypeForCollision()
     table.each(tilesUnderEntity, function(tile)
         --check if tile would collide with player or water-tile
-        if tile.has_tile_ghost() or not table.any(landFillForCollision, function(lanfill, collsionLayer) return tile.collides_with(collsionLayer) end) then
+        if tile.has_tile_ghost() or (not table.any(landFillForCollision, function(lanfill, collsionLayer) return tile.collides_with(collsionLayer) end)) then
             return
         end
 
         local usedLandfillType = table.find(landFillForCollision, function(lanfill, collsionLayer) return tile.collides_with(collsionLayer) end)
 
         surface.create_entity { name = "tile-ghost", position = tile.position, force = dummyEntity.force,
-            inner_name = usedLandfillType }
+        raise_built = true ,inner_name = usedLandfillType }
     end)
 end
 

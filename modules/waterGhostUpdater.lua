@@ -3,12 +3,16 @@ local waterGhostUpdater = {}
 
 --require
 local constants = require('modules/constants')
+local waterGhostCommon = require('modules/waterGhostCommon')
+local landfillPlacer = require('modules/landfillPlacer')
 local util = require('util')
 local table = require('__stdlib__/stdlib/utils/table')
-local waterGhostCommon = require('modules/waterGhostCommon')
+local Queue = require('__stdlib__/stdlib/misc/queue')
+local Is = require('__stdlib__/stdlib/utils/is')
 
---split function above into multiple functions to make it more readable
-waterGhostUpdater.getWaterGhostEntities = function ()
+--searches all surfaces for water ghosts and returns a table of all the water ghosts found
+--this function is very slow for large maps and should only be used to force the known water ghosts table
+local getWaterGhostEntities = function ()
     --get all surfaces
     local surfaces = game.surfaces
     local ghosts = {}
@@ -25,8 +29,6 @@ waterGhostUpdater.getWaterGhostEntities = function ()
 
     return ghosts
 end
-
-
 
 --function that check if the original entity could be placed in the location of the dummy entity
 local function canPlaceOriginalEntity(originalEntityName, dummyEntity)
@@ -50,7 +52,7 @@ end
 
 --function that replaces all dummy entity ghosts with the original entity ghosts
 --use orderUpgrade to upgrade the dummy entity ghosts to the original entity ghosts
-waterGhostUpdater.replaceDummyEntityGhost = function(dummyEntity)
+local replaceDummyEntityGhost = function(dummyEntity)
     --get the original entity name from the dummy entity name
     local originalEntityName = waterGhostCommon.getOriginalEntityName(dummyEntity.ghost_name)
     --check if the original entity can be placed in the location and with the same direction of the dummy entity
@@ -59,4 +61,65 @@ waterGhostUpdater.replaceDummyEntityGhost = function(dummyEntity)
         dummyEntity.order_upgrade { force = dummyEntity.force, target = originalEntityName }
     end
 end
+
+--Main function that turns dummy entity ghosts into normal entity ghosts after landfill has been placed
+waterGhostUpdater.waterGhostUpdate = function()
+    --return if global table is not initialised
+    if not global.GhostOnWater then return end
+    --return if the known water ghosts queue is not initialised
+    if not global.GhostOnWater.KnownWaterGhosts then return end
+    --return if the known water ghosts queue is empty
+    if #global.GhostOnWater.KnownWaterGhosts == 0 then return end
+
+    --loop trough all known water ghosts
+
+    for i = 1, #global.GhostOnWater.KnownWaterGhosts do
+        local knownWaterGhostInfo = global.GhostOnWater.KnownWaterGhosts()
+        local waterGhostEntity = knownWaterGhostInfo.ghost
+        --go to continue if the entity is not valid
+        if not Is.valid(waterGhostEntity) then goto continue end
+        --replace dummy entity ghost with original entity ghost
+        replaceDummyEntityGhost(waterGhostEntity)
+        --go to continue if the entity is not valid or if the entity is not a dummy entity ghost
+        if not Is.valid(waterGhostEntity) then goto continue end
+        if not util.string_starts_with(waterGhostEntity.ghost_name, constants.dummyPrefix) then goto continue end
+        --place ghost landfill under dummy entity ghost
+        landfillPlacer.placeGhostLandfill(waterGhostEntity, knownWaterGhostInfo.tiles)
+        
+        --entity is still valid after replacing so it needs to be pushed back onto the queue
+        global.GhostOnWater.KnownWaterGhosts({ghost = waterGhostEntity, tiles = knownWaterGhostInfo.tiles})
+
+        ::continue::
+    end
+
+    if __Profiler then
+        remote.call("profiler", "dump")
+    end
+end
+
+--forces an update of the known water ghosts table by searching all surfaces for water ghosts. Performance Heavy
+waterGhostUpdater.forceUpdateKnownWaterGhosts = function()
+    --get all water ghosts
+    local waterGhosts = getWaterGhostEntities()
+    --update the known water ghosts table
+    --set to a new empty queue
+    global.GhostOnWater.KnownWaterGhosts = Queue()
+    table.each(waterGhosts, function(ghost)
+        --push every found water ghost onto the queue
+        global.GhostOnWater.KnownWaterGhosts({ghost = ghost, tiles = {}})
+    end)
+end
+
+--adds an entity to the known waater ghosts table if it's a water ghost dummy entity
+waterGhostUpdater.addEntityToKnownWaterGhosts = function(entity)
+    --return if the entity is not of type entity-ghost
+    if entity.type ~= 'entity-ghost' then return end
+
+    --check if the entity is a dummy entity
+    if util.string_starts_with(entity.ghost_name, constants.dummyPrefix) then
+        --add the entity to the known water ghosts table
+        global.GhostOnWater.KnownWaterGhosts({ghost = entity, tiles = {}})
+    end
+end
+
 return waterGhostUpdater
