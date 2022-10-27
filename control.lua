@@ -20,6 +20,14 @@ local function fillWaterGhostTypes()
 end
 
 
+--sets event filters for the diffrent build events this needs to be done both on reInint and on load
+local function setBuildEventFilters()
+    local filterArray = table.map(global.GhostOnWater.WaterGhostNames, function(name) return { filter = 'ghost_name', name = name } end)
+
+    script.set_event_filter(defines.events.on_built_entity, filterArray)
+    script.set_event_filter(defines.events.script_raised_built, filterArray)
+    script.set_event_filter(defines.events.on_entity_cloned, filterArray)
+end
 
 --re initilises data global table
 local function reInitGlobalTable()
@@ -30,6 +38,7 @@ local function reInitGlobalTable()
     }
 
     fillWaterGhostTypes()
+    setBuildEventFilters()
     --force the known water ghosts table to be updated
     waterGhostUpdater.forceUpdateKnownWaterGhosts()
 
@@ -45,7 +54,10 @@ end
 
 local function onLoad() 
     Queue.load(global.GhostOnWater.KnownWaterGhosts)
+    setBuildEventFilters()
 end
+
+
 
 --event handlers for everything non inilisation related
 
@@ -85,7 +97,7 @@ end
 local function onBuildEvent(event) 
     local buildEntity = event.created_entity or event.entity or event.destination
     --check if the build entity is valid
-    if not Is.valid(buildEntity) then return end
+    if not buildEntity then return end
 
     waterGhostUpdater.addEntityToKnownWaterGhosts(buildEntity)
 
@@ -105,7 +117,7 @@ Event.on_nth_tick(updateRate, waterGhostUpdater.waterGhostUpdate)
 Event.on_nth_tick(constants.settingsUpdateDelay, updateSettings)
 --register event handlers for on_build_entity, on_script_raised_built and on_entity_cloned
 Event.register(defines.events.on_built_entity, onBuildEvent)
-Event.register(defines.events.on_robot_built_entity, onBuildEvent)
+Event.register(defines.events.script_raised_built, onBuildEvent)
 Event.register(defines.events.on_entity_cloned, onBuildEvent)
 --add event handler for update blueprint shortcut using filter function
 Event.register(defines.events.on_lua_shortcut, onBlueprintUpdateTriggerd, function(event, shortcut)

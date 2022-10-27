@@ -73,7 +73,7 @@ waterGhostUpdater.waterGhostUpdate = function()
 
     --loop trough all known water ghosts
 
-    for i = 1, #global.GhostOnWater.KnownWaterGhosts do
+    for i = 1, math.min(#global.GhostOnWater.KnownWaterGhosts, settings.global.WaterGhostMaxWaterGhostsPerUpdate.value) do
         local knownWaterGhostInfo = global.GhostOnWater.KnownWaterGhosts()
         local waterGhostEntity = knownWaterGhostInfo.ghost
         --go to continue if the entity is not valid
@@ -113,13 +113,13 @@ end
 --adds an entity to the known waater ghosts table if it's a water ghost dummy entity
 waterGhostUpdater.addEntityToKnownWaterGhosts = function(entity)
     --return if the entity is not of type entity-ghost
-    if entity.type ~= 'entity-ghost' then return end
+    --if entity.type ~= 'entity-ghost' then return end
 
     --check if the entity is a dummy entity
-    if util.string_starts_with(entity.ghost_name, constants.dummyPrefix) then
+    --if util.string_starts_with(entity.ghost_name, constants.dummyPrefix) then
         --add the entity to the known water ghosts table
-        global.GhostOnWater.KnownWaterGhosts({ghost = entity, tiles = {}})
-    end
+    global.GhostOnWater.KnownWaterGhosts({ghost = entity, tiles = {}})
+    --end
 end
 
 return waterGhostUpdater
