@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.1
+Date: 2022.10.27
+  Bugfixes:
+    - Fixed crashes when used with mods that add rails that can alreaady be placed on water. (e.g. Beautiful Bridge Railway)
+---------------------------------------------------------------------------------------------------
 Version: 0.8.0
 Date: 2022.10.27
   Info:
