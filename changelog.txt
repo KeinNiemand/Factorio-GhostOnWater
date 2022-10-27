@@ -9,6 +9,7 @@ Date: 2022.10.27
   Info:
     - Performance update. Make sure to set update delay to the new default (or whatever you prefer), 
       since it will not update on existing save files that already used a prior version of the mod and the old default is rather slow when combined with the limited ghosts proccesed per update.
+      Also make sure to reset update delay to the new default in the main menu mod settings, since the new default also may not be applied there so the old default would be used for new maps.
   Optimisations:
     - Store Knwon water ghosts in global table, instead of scanning for them every update.
     - Limit the number of water ghosts processed per update. (Default 300)
