@@ -33,7 +33,7 @@ local WaterGhostUpdateDelay = {
     minimum_value         = 1,
     maximum_value         = 3600,
     localised_name        = "Update Delay",
-    localised_description = "Delay between water ghost (dummy) entiy updates in ticks (60 tick = 1 second).\nWater ghost entitie updates are performace heavy and may cause lag spikes.\nHigher values reduce the amount of updates and reduce lag spikes.\nLower values increase the amount of updates and increase lag spikes.\nIf you experience lag spikes, increase this value to make them less frequent.",
+    localised_description = "Delay between water ghost updates in ticks (60 tick = 1 second).\nThe mod will try to place ghost/check if water ghosts can be turned into real ghosts every uptate.\nLowering this will decrease the time it takes for ghost landfill to get added/to convert water ghosts to real ghosts, at the cost of performance.",
 }
 
 data:extend({ WaterGhostUpdateDelay })
@@ -46,7 +46,7 @@ data:extend({ {
     minimum_value         = 1,
     maximum_value         = 10000,
     localised_name        = "Water Ghosts Per Update",
-    localised_description = "The maximum amount of water ghosts that will be updated per update.\nLower value reduce performace impact, but it may take several updates to update all water ghosts.",
+    localised_description = "The maximum amount of water ghosts that will be updated per update.\nLower value reduce performace of water ghost updates impact, but it may take several updates to update all water ghosts.",
 } })
 
 if (isSpaceExplorationLoaded) then
