@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.2
+Date: 2022.10.28
+  Info:
+    - Changed minimum required version of the game to 1.1.61 (mod requires an mod API feature that was added in this version)
+  Bugfixes:
+    - Fixed crash when trying to revert a blueprint that is already non water placeable
+    - Tried fixing Multiplayer (no easy way to test this as just one person)
+---------------------------------------------------------------------------------------------------
 Version: 0.8.1
 Date: 2022.10.27
   Bugfixes:
