@@ -27,16 +27,6 @@ local function getTilesInBoundingBox(entity)
     local tiles = {}
     local surface = entity.surface
     local boundingBox = entity.bounding_box
-    
-    --if (prototype.collision_mask) then
-    --    collisionMask = prototype.collision_mask
-    --end
-
-    --local addColidingTile = function(tile)
-    --    if table.any(collisionMask, function(_ ,collision) return tile.collides_with(collision) end) then
-    --        table.insert(tiles, tile)
-    --    end
-    --end
 
     --function inside function that gets the tiles in a bounding box and adds them to the tiles table
     local addTilesFromBoundingBox = function(boundingBox)
