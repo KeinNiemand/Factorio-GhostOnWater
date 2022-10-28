@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.0
+Date: 2022.10.28
+  Graphics:
+    - Added Icon for shortcut buttons and water Ghost dummy items, icon is a modified Dall E 2 generation.
+---------------------------------------------------------------------------------------------------
 Version: 0.8.2
 Date: 2022.10.28
   Info:
