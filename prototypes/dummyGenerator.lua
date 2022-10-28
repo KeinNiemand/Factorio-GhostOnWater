@@ -263,6 +263,10 @@ local function createDummyItem(originalItem)
             dummyItem.group = constants.dummyPrefix
             --set item subgroup to nil
             dummyItem.subgroup = nil
+            --set item icon to use waterGhostBlueprintUpdate.png
+            dummyItem.icon = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png"
+            --set item icon size to 256
+            dummyItem.icon_size = 256            
 
             if dummyItem.flags == nil then
                 dummyItem.flags = {}
