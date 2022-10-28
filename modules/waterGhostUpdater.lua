@@ -65,7 +65,7 @@ end
 --Main function that turns dummy entity ghosts into normal entity ghosts after landfill has been placed
 waterGhostUpdater.waterGhostUpdate = function(event)
     --return if the event.tick is not a multiple of the update interval
-    if event.tick % settings.global.WaterGhostUpdateDelay ~= 0 then return end
+    if event.tick % settings.global.WaterGhostUpdateDelay.value ~= 0 then return end
 
     --return if global table is not initialised
     if not global.GhostOnWater then return end
