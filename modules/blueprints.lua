@@ -4,6 +4,7 @@ local constants = require('modules/constants')
 local waterGhostCommon = require('modules/waterGhostCommon')
 local Inventory = require('__stdlib__/stdlib/entity/inventory')
 local table = require('__stdlib__/stdlib/utils/table')
+local util = require('util')
 
 
 blueprints.updateBlueprint = function(playerIndex, replacerFunction)
@@ -42,7 +43,12 @@ blueprints.bpReplacerToDummy = function(entity)
 end
 
 blueprints.bpReplacerToOriginal = function(entity) 
-    entity.name = waterGhostCommon.getOriginalEntityName(entity.name)
+    
+    if (util.string_starts_with(entity.name, constants.dummyPrefix)) then
+        --replace entity with original entity
+        entity.name = waterGhostCommon.getOriginalEntityName(entity.name)
+    end
+    
     return entity
 end
 

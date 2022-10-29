@@ -7,7 +7,7 @@ local waterGhostItemGroup = {
     order = "zzz",
     inventory_order = "zzz",
     icon = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png",
-    icon_size = 16,
+    icon_size = 256,
 }
 
 data:extend({waterGhostItemGroup})

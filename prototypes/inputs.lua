@@ -5,7 +5,7 @@ data:extend{{
     name = "ShortcutWaterGhostBlueprintUpdate",
     icon = {
         filename = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png",
-        size = 16,
+        size = 256,
         scale = 1,
         flags = {"icon"}
     },
@@ -17,8 +17,8 @@ data:extend{{
     action = "lua",
     name = "ShortcutWaterGhostBlueprintRevert",
     icon = {
-        filename = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png",
-        size = 16,
+        filename = "__GhostOnWater__/icons/waterGhostBlueprintRevert.png",
+        size = 256,
         scale = 1,
         flags = {"icon"}
     },

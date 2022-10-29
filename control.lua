@@ -1,5 +1,4 @@
 --require
-
 local constants = require('modules/constants')
 local Event = require('__stdlib__/stdlib/event/event')
 local util = require('util')
@@ -7,22 +6,20 @@ local table = require('__stdlib__/stdlib/utils/table')
 local Queue = require('__stdlib__/stdlib/misc/queue')
 local Is = require('__stdlib__/stdlib/utils/is')
 local blueprints = require('modules/blueprints')
-local landfillPlacer = require('modules/landfillPlacer')
 local waterGhostUpdater = require('modules/waterGhostUpdater')
 
-local updateRate = constants.defaultUpdateDelay
 
 --get all entity prototypes names whos name starts with constants.dummyPrefix
 local function fillWaterGhostTypes()
     global.GhostOnWater.WaterGhostNames = table.filter(
-        table.map(game.entity_prototypes ,function(prototype) return prototype.name end),
+        table.map(game.entity_prototypes, function(prototype) return prototype.name end),
         function(name) return util.string_starts_with(name, constants.dummyPrefix) end)
 end
 
-
 --sets event filters for the diffrent build events this needs to be done both on reInint and on load
 local function setBuildEventFilters()
-    local filterArray = table.map(global.GhostOnWater.WaterGhostNames, function(name) return { filter = 'ghost_name', name = name } end)
+    local filterArray = table.map(global.GhostOnWater.WaterGhostNames,
+        function(name) return { filter = 'ghost_name', name = name } end)
 
     script.set_event_filter(defines.events.on_built_entity, filterArray)
     script.set_event_filter(defines.events.script_raised_built, filterArray)
@@ -31,7 +28,7 @@ end
 
 --re initilises data global table
 local function reInitGlobalTable()
-    global.GhostOnWater = 
+    global.GhostOnWater =
     {
         WaterGhostNames = {},
         KnownWaterGhosts = Queue()
@@ -52,35 +49,33 @@ local function reInitGlobalTable()
 
 end
 
-local function onLoad() 
+local function onLoad()
     Queue.load(global.GhostOnWater.KnownWaterGhosts)
     setBuildEventFilters()
 end
 
-
-
 --event handlers for everything non inilisation related
 
 --checks if runtime mod settings that need to be applied changed and applies them
-local function updateSettings()
-    if (settings.global["WaterGhostUpdateDelay"]) then
-        local previousUpdateRate = updateRate
----@diagnostic disable-next-line: cast-local-type
-        updateRate = settings.global["WaterGhostUpdateDelay"].value
-        --don't do anything if the update rate hasn't changed
-        if (previousUpdateRate == updateRate) then return end
+-- local function updateSettings()
+--     if (settings.global["WaterGhostUpdateDelay"]) then
+--         local previousUpdateRate = updateRate
+-- ---@diagnostic disable-next-line: cast-local-type
+--         updateRate = settings.global["WaterGhostUpdateDelay"].value
+--         --don't do anything if the update rate hasn't changed
+--         if (previousUpdateRate == updateRate) then return end
 
-        --remove the old event
-        Event.remove(previousUpdateRate * -1, waterGhostUpdater.waterGhostUpdate)
-        Event.on_nth_tick(updateRate, waterGhostUpdater.waterGhostUpdate)
+--         --remove the old event
+--         Event.remove(previousUpdateRate * -1, waterGhostUpdater.waterGhostUpdate)
+--         Event.on_nth_tick(updateRate, waterGhostUpdater.waterGhostUpdate)
 
-    else
-        game.print("WaterGhostUpdateRate setting not found")
-        return
-    end
+--     else
+--         game.print("WaterGhostUpdateRate setting not found")
+--         return
+--     end
 
 
-end
+-- end
 
 --runs when user triggers a blueprint update with the shortcut or hotkey
 local function onBlueprintUpdateTriggerd(event)
@@ -93,8 +88,8 @@ local function onBlueprintRevertTriggerd(event)
     blueprints.updateBlueprint(playerIndex, blueprints.bpReplacerToOriginal)
 end
 
---handles on_build_entity, on_script_raised_built and on_entity_cloned events 
-local function onBuildEvent(event) 
+--handles on_build_entity, on_script_raised_built and on_entity_cloned events
+local function onBuildEvent(event)
     local buildEntity = event.created_entity or event.entity or event.destination
     --check if the build entity is valid
     if not buildEntity then return end
@@ -112,10 +107,11 @@ Event.on_init(reInitGlobalTable)
 --on load event to on_load
 Event.on_load(onLoad)
 --add event handler for waterGhostUpdate
-Event.on_nth_tick(updateRate, waterGhostUpdater.waterGhostUpdate)
+Event.register(defines.events.on_tick, waterGhostUpdater.waterGhostUpdate)
 --add event handler for updateSettings
-Event.on_nth_tick(constants.settingsUpdateDelay, updateSettings)
+--Event.on_nth_tick(constants.settingsUpdateDelay, updateSettings)
 --register event handlers for on_build_entity, on_script_raised_built and on_entity_cloned
+
 Event.register(defines.events.on_built_entity, onBuildEvent)
 Event.register(defines.events.script_raised_built, onBuildEvent)
 Event.register(defines.events.on_entity_cloned, onBuildEvent)
