@@ -234,6 +234,9 @@ local function createDummyEntity(originalEntity)
         originalEntity.fast_replaceable_group = dummyEntity.name
     end
 
+    --remove any autoplace spec in the entity
+    dummyEntity.autoplace = nil
+
     --return the dummy prototype
     return dummyEntity
 end
