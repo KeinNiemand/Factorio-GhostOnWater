@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.1
+Date: 2022.10.29
+  Bugfixes:
+    - Fixed crash when used with mods that add rails where only straight or curved rails can already be placed on water.
+    - Tried fixing crash with mod that makes resources item placable while Space Exploration is also installed.
+---------------------------------------------------------------------------------------------------
 Version: 0.9.0
 Date: 2022.10.28
   Graphics:
