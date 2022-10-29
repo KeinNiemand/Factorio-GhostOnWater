@@ -315,12 +315,12 @@ dummyGenerator.GenerateDummyPrototypes = function()
             data:extend({dummyItem})
         end
 
-        if entityCollidesWithMask(entityTable[prototypeRailPlaner.straight_rail], waterCollisionMask) then 
+        if straightRailCollidesWithWater or curvedRailCollidesWithWater then 
             local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.straight_rail])
             data:extend({dummyEntity})
         end
 
-        if entityCollidesWithMask(entityTable[prototypeRailPlaner.curved_rail], waterCollisionMask) then 
+        if straightRailCollidesWithWater or curvedRailCollidesWithWater then 
             local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.curved_rail])
             data:extend({dummyEntity})
         end
