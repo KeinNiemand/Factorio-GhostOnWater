@@ -21,6 +21,12 @@ if (mods ["space-exploration"]) then
     mask_util.add_layer(waterCollisionMask, empty_space_collision_layer)
 end
 
+--alien biomes shallow water compatibility
+if (mods ["alien-biomes"]) then
+    --shalloow water
+    mask_util.add_layer(waterCollisionMask, "floor-layer")
+end
+
 
 
 --add anything in specialRemovalCollsionMask to waterCollisionMask so it gets removed from the dummy entity
