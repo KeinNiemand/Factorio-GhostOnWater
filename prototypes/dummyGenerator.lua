@@ -75,14 +75,14 @@ end
 --adds alternative layer for special removal collision mask
 local function addAlternativeLayerForSpeicalRemovals(entitys)
     if Is.Empty(specialRemovalCollsionMask) then return end
- 
+
     table.each(specialRemovalCollsionMask, function(altLayer ,layer)
          --get unused collision layer and store it in speical removal collision mask
          if altLayer == "" then
              altLayer = mask_util.get_first_unused_layer()
              specialRemovalCollsionMask[layer] = altLayer
          end
- 
+
          for _, prototype in pairs(entitys) do
             if not prototype then goto next end
 
@@ -162,7 +162,7 @@ local function createDummyEntity(originalEntity)
         return nil
     end
 
-    --handle offshore pumps specific masks and tests 
+    --handle offshore pumps specific masks and tests
     local originalMask2 = dummyEntity.adjacent_tile_collision_mask
     local originalMask3 = dummyEntity.center_collision_mask
     local originalTest = dummyEntity.fluid_box_tile_collision_test
@@ -183,20 +183,20 @@ local function createDummyEntity(originalEntity)
     end
     if originalTest2 then
 
-        --if originalTest2 is not empty 
+        --if originalTest2 is not empty
         if not table.is_empty(originalTest2) and Is.Table(originalTest2) then
             mask_util.add_layer(originalTest2 ,"water-tile")
         elseif Is.String(originalTest2) then
             dummyEntity.adjacent_tile_collision_test = "water-tile"
         end
-        
+
     end
 
     --remove water-tile from collision mask
     dummyEntity.collision_mask = originalMask
     --remove all collsion mask items in water-tile-collsion-mask
     removeCollisionMaskFromCollisonmask(dummyEntity.collision_mask, waterCollisionMask)
-    
+
     --change the name of the dummy prototype to dummyPrefix .. name
     dummyEntity.name = constants.dummyPrefix .. dummyEntity.name
 
@@ -223,13 +223,13 @@ local function createDummyEntity(originalEntity)
     end
 
     if dummyEntity.placeable_by then
-        if dummyEntity.placeable_by.item then 
+        if dummyEntity.placeable_by.item then
             dummyEntity.placeable_by = { item = constants.dummyPrefix .. dummyEntity.placeable_by.item, count = dummyEntity.placeable_by.count }
 
-        else 
+        else
             dummyEntity.placeable_by = table.map
-            (dummyEntity.placeable_by, 
-            function(itemToPlace) 
+            (dummyEntity.placeable_by,
+            function(itemToPlace)
                 return { item = constants.dummyPrefix .. itemToPlace.item, count = itemToPlace.count }
             end) end
     end
@@ -242,6 +242,9 @@ local function createDummyEntity(originalEntity)
 
     --remove any autoplace spec in the entity
     dummyEntity.autoplace = nil
+
+    --generate localisation from the original entity
+    dummyEntity.localised_name = {"", originalEntity.localised_name or {"entity-name." .. originalEntity.name}, " - ", {"dummy_name_suffix"}}
 
     --return the dummy prototype
     return dummyEntity
@@ -272,22 +275,38 @@ local function createDummyItem(originalItem)
             dummyItem.group = constants.dummyPrefix
             --set item subgroup to nil
             dummyItem.subgroup = nil
-            dummyItem.icons = nil
-            --set item icon to use waterGhostBlueprintUpdate.png
-            dummyItem.icon = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png"
-            --set item icon size to 256
-            dummyItem.icon_size = 256            
+            --Compose icon
+            local overlay_icon = {
+                icon = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png",
+                icon_size = 256,
+                scale = 0.075,
+                shift = {6, -6}
+            }
+            if dummyItem.icons == nil then
+                dummyItem.icons = {
+                    {
+                        icon = dummyItem.icon,
+                        icon_size = dummyItem.icon_size
+                    },
+                    overlay_icon
+                }
+            else
+                table.insert(dummyItem.icons, overlay_icon)
+            end
 
             if dummyItem.flags == nil then
                 dummyItem.flags = {}
             end
             table.insert(dummyItem.flags, "hidden")
-            
+
+             --generate localisation from the original item
+            dummyItem.localised_name = {"", originalItem.localised_name or {"entity-name." .. originalItem.name}, " - ", {"dummy_name_suffix"}}
+
             return dummyItem
 end
 
-dummyGenerator.GenerateDummyPrototypes = function() 
-    
+dummyGenerator.GenerateDummyPrototypes = function()
+
     --handle special removals
     addAlternativeLayerForSpeicalRemovals(entityTable)
 
@@ -320,7 +339,7 @@ dummyGenerator.GenerateDummyPrototypes = function()
         if prototypeRailPlaner.curved_rail == nil then
             goto continue
         end
-        
+
         local straightRailCollidesWithWater = entityCollidesWithMask(entityTable[prototypeRailPlaner.straight_rail], waterCollisionMask)
         local curvedRailCollidesWithWater = entityCollidesWithMask(entityTable[prototypeRailPlaner.curved_rail], waterCollisionMask)
 
@@ -329,12 +348,12 @@ dummyGenerator.GenerateDummyPrototypes = function()
             data:extend({dummyItem})
         end
 
-        if straightRailCollidesWithWater or curvedRailCollidesWithWater then 
+        if straightRailCollidesWithWater or curvedRailCollidesWithWater then
             local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.straight_rail])
             data:extend({dummyEntity})
         end
 
-        if straightRailCollidesWithWater or curvedRailCollidesWithWater then 
+        if straightRailCollidesWithWater or curvedRailCollidesWithWater then
             local dummyEntity = createDummyEntity(entityTable[prototypeRailPlaner.curved_rail])
             data:extend({dummyEntity})
         end
@@ -342,7 +361,7 @@ dummyGenerator.GenerateDummyPrototypes = function()
         ::continue::
     end
 
-    
+
 
 end
 
