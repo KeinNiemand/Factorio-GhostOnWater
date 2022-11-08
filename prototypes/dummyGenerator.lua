@@ -275,11 +275,24 @@ local function createDummyItem(originalItem)
             dummyItem.group = constants.dummyPrefix
             --set item subgroup to nil
             dummyItem.subgroup = nil
-            dummyItem.icons = nil
-            --set item icon to use waterGhostBlueprintUpdate.png
-            dummyItem.icon = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png"
-            --set item icon size to 256
-            dummyItem.icon_size = 256
+            --Compose icon
+            local overlay_icon = {
+                icon = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png",
+                icon_size = 256,
+                scale = 0.075,
+                shift = {6, -6}
+            }
+            if dummyItem.icons == nil then
+                dummyItem.icons = {
+                    {
+                        icon = dummyItem.icon,
+                        icon_size = dummyItem.icon_size
+                    },
+                    overlay_icon
+                }
+            else
+                table.insert(dummyItem.icons, overlay_icon)
+            end
 
             if dummyItem.flags == nil then
                 dummyItem.flags = {}
