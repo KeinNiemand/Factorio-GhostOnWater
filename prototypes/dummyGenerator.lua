@@ -305,6 +305,15 @@ local function createDummyItem(originalItem)
             return dummyItem
 end
 
+-- Krastorio2 has special roboport entities for different roboport modi. This function will create dummies for these entities
+-- @parameter roboportName Name of the roboport for which the dummies should be created.
+local function createKrastorio2RoboportModeDummies(roboportName)
+	local dummyEntity = createDummyEntity(entityTable[roboportName .. "-logistic-mode"])
+    data:extend({dummyEntity})
+	local dummyEntity = createDummyEntity(entityTable[roboportName .. "-construction-mode"])
+    data:extend({dummyEntity})
+end
+
 dummyGenerator.GenerateDummyPrototypes = function()
 
     --handle special removals
@@ -320,6 +329,15 @@ dummyGenerator.GenerateDummyPrototypes = function()
             end
         end
     end
+	
+	if mods["Krastorio2"] then
+		createKrastorio2RoboportModeDummies("kr-large-roboport")
+		createKrastorio2RoboportModeDummies("kr-small-roboport")
+		createKrastorio2RoboportModeDummies("roboport")
+		if mods["IndustrialRevolution"] then
+			createKrastorio2RoboportModeDummies("robotower")
+		end
+	end
 
     --go trogh all rail-planners
     for name, prototypeRailPlaner in pairs(data.raw["rail-planner"]) do
