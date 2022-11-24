@@ -327,38 +327,6 @@ dummyGenerator.GenerateDummyPrototypes = function()
         end
     end
     
-    roboports = {}
-    for _, prototype in pairs(data.raw.roboport) do
-        if prototype.placeable_by == nil then
-            -- can't be placed via blueprint
-            goto continue_roboports
-        end
-        dummyName = constants.dummyPrefix .. prototype.name
-        if data.raw.roboport[dummyName] ~= nil then
-            -- ghost on water dummy already exists
-            goto continue_roboports
-        end
-        -- check if all items which can place this entity have a ghost on water entity.
-        -- if not ignore them for now.
-        if prototype.placeable_by.item then
-            if not ghostOnWaterDummyItemExists(prototype.placeable_by.item) then
-                goto continue_roboports
-            end
-        else
-            for _, ItemToPlace in ipairs(prototype.placeable_by) do
-                if not ghostOnWaterDummyItemExists(ItemToPlace.item) then
-                    goto continue_roboports
-                end
-            end             
-        end
-        table.insert(roboports, prototype)
-        ::continue_roboports::
-    end
-    for _,prototype in pairs(roboports) do
-        local dummyEntity = createDummyEntity(prototype)
-        data:extend({dummyEntity})
-    end
-
     --go trogh all rail-planners
     for name, prototypeRailPlaner in pairs(data.raw["rail-planner"]) do
 
@@ -399,6 +367,33 @@ dummyGenerator.GenerateDummyPrototypes = function()
         ::continue::
     end
 
+    for name, prototype in pairs(entityTable) do
+        if prototype.placeable_by == nil then
+            -- can't be placed via blueprint
+            goto continue_roboports
+        end
+        dummyName = constants.dummyPrefix .. prototype.name
+        if data.raw.roboport[dummyName] ~= nil then
+            -- ghost on water dummy already exists
+            goto continue_roboports
+        end
+        -- check if all items which can place this entity have a ghost on water entity.
+        -- if not ignore them for now.
+        if prototype.placeable_by.item then
+            if not ghostOnWaterDummyItemExists(prototype.placeable_by.item) then
+                goto continue_roboports
+            end
+        else
+            for _, ItemToPlace in ipairs(prototype.placeable_by) do
+                if not ghostOnWaterDummyItemExists(ItemToPlace.item) then
+                    goto continue_roboports
+                end
+            end             
+        end
+        local dummyEntity = createDummyEntity(prototype)
+        data:extend({dummyEntity})
+        ::continue_roboports::
+    end
 
 
 end
