@@ -154,6 +154,8 @@ local function  removeCollisionMaskFromCollisonmask(mask, maskToRemove)
     end
 end
 
+local dummyEntityCreatedFor =  {}
+
 local function createDummyEntity(originalEntity)
     local dummyEntity = table.deepcopy(originalEntity)
     --remove collision with water tile
@@ -246,6 +248,7 @@ local function createDummyEntity(originalEntity)
     --generate localisation from the original entity
     dummyEntity.localised_name = {"", originalEntity.localised_name or {"entity-name." .. originalEntity.name}, " - ", {"dummy_name_suffix"}}
 
+    dummyEntityCreatedFor[originalEntity.name] = true
     --return the dummy prototype
     return dummyEntity
 end
@@ -370,29 +373,28 @@ dummyGenerator.GenerateDummyPrototypes = function()
     for name, prototype in pairs(entityTable) do
         if prototype.placeable_by == nil then
             -- can't be placed via blueprint
-            goto continue_roboports
+            goto continue_entity
         end
-        dummyName = constants.dummyPrefix .. prototype.name
-        if data.raw.roboport[dummyName] ~= nil then
+        if dummyEntityCreatedFor[prototype.name] then
             -- ghost on water dummy already exists
-            goto continue_roboports
+            goto continue_entity
         end
         -- check if all items which can place this entity have a ghost on water entity.
         -- if not ignore them for now.
         if prototype.placeable_by.item then
             if not ghostOnWaterDummyItemExists(prototype.placeable_by.item) then
-                goto continue_roboports
+                goto continue_entity
             end
         else
             for _, ItemToPlace in ipairs(prototype.placeable_by) do
                 if not ghostOnWaterDummyItemExists(ItemToPlace.item) then
-                    goto continue_roboports
+                    goto continue_entity
                 end
             end             
         end
         local dummyEntity = createDummyEntity(prototype)
         data:extend({dummyEntity})
-        ::continue_roboports::
+        ::continue_entity::
     end
 
 
