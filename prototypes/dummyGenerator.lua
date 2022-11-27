@@ -375,6 +375,9 @@ dummyGenerator.GenerateDummyPrototypes = function()
             -- can't be placed via blueprint
             goto continue_entity
         end
+        if not entityCollidesWithMask(prototype, waterCollisionMask) then
+            goto continue_entity
+        end
         if dummyEntityCreatedFor[prototype.name] then
             -- ghost on water dummy already exists
             goto continue_entity
