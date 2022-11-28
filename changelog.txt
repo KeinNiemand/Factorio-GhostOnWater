@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.10.1
+Date: 2022.11.28
+  Bugfixes:
+    -  Fixed compatibility with Krastorio 2 Roboport Modes or any other modded entity that have a placed_by that's not a place result.
+      (Thanks to ChaosSaber) pull request #20
+---------------------------------------------------------------------------------------------------
 Version: 0.10.0
 Date: 2022.11.08
   Graphics:
