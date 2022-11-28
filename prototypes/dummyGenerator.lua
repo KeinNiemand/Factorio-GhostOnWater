@@ -141,7 +141,7 @@ local function entityCollidesWithMask(entity, colidesWithMask)
             return true
         end
     end
-	return false
+    return false
 end
 
 --remove everything from mask that is in maskToRemove
@@ -153,6 +153,8 @@ local function  removeCollisionMaskFromCollisonmask(mask, maskToRemove)
         end
     end
 end
+
+local dummyEntityCreatedFor =  {}
 
 local function createDummyEntity(originalEntity)
     local dummyEntity = table.deepcopy(originalEntity)
@@ -246,6 +248,7 @@ local function createDummyEntity(originalEntity)
     --generate localisation from the original entity
     dummyEntity.localised_name = {"", originalEntity.localised_name or {"entity-name." .. originalEntity.name}, " - ", {"dummy_name_suffix"}}
 
+    dummyEntityCreatedFor[originalEntity.name] = true
     --return the dummy prototype
     return dummyEntity
 end
@@ -305,6 +308,12 @@ local function createDummyItem(originalItem)
             return dummyItem
 end
 
+local function ghostOnWaterDummyItemExists(itemName)
+    dummyName = constants.dummyPrefix .. itemName
+    -- Check if the item already has a dummy
+    return data.raw["item"][dummyName] ~= nil
+end
+
 dummyGenerator.GenerateDummyPrototypes = function()
 
     --handle special removals
@@ -320,7 +329,7 @@ dummyGenerator.GenerateDummyPrototypes = function()
             end
         end
     end
-
+    
     --go trogh all rail-planners
     for name, prototypeRailPlaner in pairs(data.raw["rail-planner"]) do
 
@@ -361,6 +370,35 @@ dummyGenerator.GenerateDummyPrototypes = function()
         ::continue::
     end
 
+    for name, prototype in pairs(entityTable) do
+        if prototype.placeable_by == nil then
+            -- can't be placed via blueprint
+            goto continue_entity
+        end
+        if not entityCollidesWithMask(prototype, waterCollisionMask) then
+            goto continue_entity
+        end
+        if dummyEntityCreatedFor[prototype.name] then
+            -- ghost on water dummy already exists
+            goto continue_entity
+        end
+        -- check if all items which can place this entity have a ghost on water entity.
+        -- if not ignore them for now.
+        if prototype.placeable_by.item then
+            if not ghostOnWaterDummyItemExists(prototype.placeable_by.item) then
+                goto continue_entity
+            end
+        else
+            for _, ItemToPlace in ipairs(prototype.placeable_by) do
+                if not ghostOnWaterDummyItemExists(ItemToPlace.item) then
+                    goto continue_entity
+                end
+            end             
+        end
+        local dummyEntity = createDummyEntity(prototype)
+        data:extend({dummyEntity})
+        ::continue_entity::
+    end
 
 
 end
