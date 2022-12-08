@@ -32,5 +32,5 @@ Feel free to Open a Pull Request if you want to contribute
      
 Credits
 ======
- *    This Mod uses some code from (geom2d.lua) from [Kux-BlueprintExtensions](https://mods.factorio.com/mod/Kux-BlueprintExtensions). [License for used code](https://github.com/KeinNiemand/Factorio-GhostOnWater/blob/master/lib/Geom2D_LICENCE.txt)
-*     GitHub Contributors: [Soggs](https://github.com/Soggs), [ChaosSaber](https://github.com/ChaosSaber)
+ *   This Mod uses some code from (geom2d.lua) from [Kux-BlueprintExtensions](https://mods.factorio.com/mod/Kux-BlueprintExtensions). [License for used code](https://github.com/KeinNiemand/Factorio-GhostOnWater/blob/master/lib/Geom2D_LICENCE.txt)
+*    GitHub Contributors: [Soggs](https://github.com/Soggs), [ChaosSaber](https://github.com/ChaosSaber)
