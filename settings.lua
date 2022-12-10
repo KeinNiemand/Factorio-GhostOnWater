@@ -49,6 +49,15 @@ data:extend({ {
     localised_description = "The maximum amount of water ghosts that will be updated per update.\nLower value reduce performace of water ghost updates impact, but it may take several updates to update all water ghosts.",
 } })
 
+data:extend({ {
+   type = "bool-setting",
+   name = "UpdateAllBlueprintsInBooks",
+   setting_type = "runtime-per-user",
+   default_value = true,
+   localised_name = "Update All Blueprints In Books",
+   localised_description = "Update all blueprints in a book when updating that book.\nIf this is unchecked, only the active blueprint is updated. The active blueprint is the one visible under the cursor.\nIf checked, updates are applied recursively to all books within the book as well."
+}})
+
 if (isSpaceExplorationLoaded) then
     data:extend
     { {

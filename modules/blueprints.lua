@@ -14,7 +14,7 @@ blueprints.updateBlueprint = function(playerIndex, replacerFunction)
     if player.cursor_stack.is_blueprint then
        blueprints.updateSingleBlueprint(player.cursor_stack, replacerFunction)
     elseif player.cursor_stack.is_blueprint_book then
-       blueprints.updateBlueprintBook(player.cursor_stack, replacerFunction)
+       blueprints.updateBlueprintBook(player, player.cursor_stack, replacerFunction)
     end
     --otherwise, do nothing
 end
@@ -41,10 +41,15 @@ blueprints.updateSingleBlueprint = function(blueprint, replacerFunction)
    blueprint.set_blueprint_entities(dummyEntities)
 end
 
---- Update all blueprints in a book, applying the replacerFunction to every entity. Recurs into books inside.
+--- Update blueprints in a book, applying the replacerFunction to entities.
+--
+-- If the 'UpdateAllBlueprintsInBooks' runtime-global setting is enabled (which
+-- is the default) then this updates all blueprints in the book, and recurs into
+-- books inside. If not, it only updates the active blueprint in the book.
+--
 -- @tparam LuaItemStack stack
 -- @tparam func replacerFunction
-blueprints.updateBlueprintBook = function(stack, replacerFunction)
+blueprints.updateBlueprintBook = function(player, stack, replacerFunction)
     --Safety checks: make sure stack is a blueprint book and valid
    if not stack then return end
    if not stack.valid_for_read then return end
@@ -53,19 +58,27 @@ blueprints.updateBlueprintBook = function(stack, replacerFunction)
    -- Get the underlying inventory item
    local book = stack.get_inventory(defines.inventory.item_main)
 
-   --Iterate through all blueprints in the book
-   for i=1, #book do
-      local bp = book[i]
-      if bp and bp.valid and bp.valid_for_read then
-         -- Update any blueprints
-         if bp.is_blueprint then
-            blueprints.updateSingleBlueprint(bp, replacerFunction)
+   if settings.get_player_settings(player)["UpdateAllBlueprintsInBooks"].value then
 
-         -- Update any books recursively
-         elseif bp.is_blueprint_book then
-            blueprints.updateBlueprintBook(bp, replacerFunction)
+      --Iterate through all blueprints in the book
+      for i=1, #book do
+         local bp = book[i]
+         if bp and bp.valid and bp.valid_for_read then
+            -- Update any blueprints
+            if bp.is_blueprint then
+               blueprints.updateSingleBlueprint(bp, replacerFunction)
+
+               -- Update any books recursively
+            elseif bp.is_blueprint_book then
+               blueprints.updateBlueprintBook(player, bp, replacerFunction)
+            end
          end
       end
+   elseif stack.active_index and #book >= stack.active_index then
+      log("setting is not active, so updating only the first thing")
+      -- Just update the active blueprint in the book.
+         local bp = book[stack.active_index]
+         blueprints.updateSingleBlueprint(bp, replacerFunction)
    end
 end
 
