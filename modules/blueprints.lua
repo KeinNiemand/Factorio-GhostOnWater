@@ -75,10 +75,15 @@ blueprints.updateBlueprintBook = function(player, stack, replacerFunction)
          end
       end
    elseif stack.active_index and #book >= stack.active_index then
-      log("setting is not active, so updating only the first thing")
+      --log("setting is not active, so updating only the first thing")
       -- Just update the active blueprint in the book.
          local bp = book[stack.active_index]
-         blueprints.updateSingleBlueprint(bp, replacerFunction)
+         if (bp.is_blueprint_book)
+         then
+            blueprints.updateBlueprintBook(player, bp, replacerFunction)
+         else
+            blueprints.updateSingleBlueprint(bp, replacerFunction)
+         end
    end
 end
 
