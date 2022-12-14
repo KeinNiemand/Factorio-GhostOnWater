@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.11.0
-Date: Unreleased
+Date: 2022.12.14
   Info:
     - All blueprints in a book are can be updated at once. This is the default
       behavior when a blueprint book is in the player's cursor. This can be
