@@ -5,6 +5,8 @@ Date: 2022.12.14
     - All blueprints in a book are can be updated at once. This is the default
       behavior when a blueprint book is in the player's cursor. This can be
       disabled with a new mod setting.
+    - Removed the fixed version of collision-mask-util since it was fixed in
+      Factorio 1.1.71. The mod now requires Factorio 1.1.71 or newer.
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.10.1
