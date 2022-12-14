@@ -11,6 +11,7 @@ How to use this mod
 2. Press Control + W (can be changed in control settings) or click on the shortcut button to make blueprint water/space placeable, this converts everything in the blueprint to water/space placeable water ghosts.
     *    Converted Blueprints can not be used without having this mod installed, to restore the original blueprint press Control + Shift + W while holding a converted blueprint or use the shortcut button.
     *    Make sure to revert any converted blueprints you want to use without this mod.
+    *    If you are holding a blueprint book, all blueprints in the book will be converted. This can be disabled with a mod setting.
 3. Place Blueprint, this can be on water or on land.
 4. Water Ghosts placed on water will automatically build ghost landfill/space scaffolding.
 5. Once Landfill has been build (manually or by bots)  or if the water ghosts have been placed on land, water ghosts will turn back into regular ghosts, that can be build by bots.
