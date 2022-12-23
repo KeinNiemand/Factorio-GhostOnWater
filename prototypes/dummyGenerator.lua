@@ -245,6 +245,11 @@ local function createDummyEntity(originalEntity)
     --remove any autoplace spec in the entity
     dummyEntity.autoplace = nil
 
+    --remove existing crafting categories from the dummy entity so factory planners don't see them as valid machines
+    --factorio requires the entity to have 'a' crafting category, so we replace it with a dummy category that has no recipes
+    dummyEntity.crafting_categories = {"dummy"}
+
+
     --generate localisation from the original entity
     dummyEntity.localised_name = {"", originalEntity.localised_name or {"entity-name." .. originalEntity.name}, " - ", {"dummy_name_suffix"}}
 
