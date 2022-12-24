@@ -248,6 +248,9 @@ local function createDummyEntity(originalEntity)
     --generate localisation from the original entity
     dummyEntity.localised_name = {"", originalEntity.localised_name or {"entity-name." .. originalEntity.name}, " - ", {"dummy_name_suffix"}}
 
+    --set the subgrouo of the dummy entity to the constants.dummyPrefix
+    dummyEntity.subgroup = constants.dummyPrefix
+
     dummyEntityCreatedFor[originalEntity.name] = true
     --return the dummy prototype
     return dummyEntity
@@ -277,7 +280,7 @@ local function createDummyItem(originalItem)
             --set item group to dummy item group
             dummyItem.group = constants.dummyPrefix
             --set item subgroup to nil
-            dummyItem.subgroup = nil
+            dummyItem.subgroup = constants.dummyPrefix
             --Compose icon
             local overlay_icon = {
                 icon = "__GhostOnWater__/icons/waterGhostBlueprintUpdate.png",
