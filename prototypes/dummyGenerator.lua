@@ -247,7 +247,9 @@ local function createDummyEntity(originalEntity)
 
     --remove existing crafting categories from the dummy entity so factory planners don't see them as valid machines
     --factorio requires the entity to have 'a' crafting category, so we replace it with a dummy category that has no recipes
-    dummyEntity.crafting_categories = {"dummy"}
+    if dummyEntity.crafting_categories ~= nil then
+        dummyEntity.crafting_categories = { constants.dummyPrefix }
+    end
 
 
     --generate localisation from the original entity
