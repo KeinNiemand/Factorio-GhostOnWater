@@ -32,7 +32,7 @@ blueprints.updateSingleBlueprint = function(blueprint, replacerFunction)
    --get blueprint entities
    local blueprintEntities = blueprint.get_blueprint_entities()
    --return if blueprintEntities is empty
-   if # blueprintEntities == 0 then return end
+   if not blueprintEntities or # blueprintEntities == 0 then return end
 
    --replace blueprint entities with dummy entities using table.map
    local dummyEntities = table.map(blueprintEntities, replacerFunction)
