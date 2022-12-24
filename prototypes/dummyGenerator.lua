@@ -209,6 +209,9 @@ local function createDummyEntity(originalEntity)
     table.insert(dummyEntity.flags, "hidden")
 
     --remove the not-upgradable flag from the flags table
+    if (table.containsValue(dummyEntity.flags, "not-upgradable")) then
+        table.remove(dummyEntity.flags, table.indexOf(dummyEntity.flags, "not-upgradable"))
+    end
     --table.remove(dummyEntity.flags, table.indexOf(dummyEntity.flags, "not-upgradable"))
 
     --check if next-upgrade exists
