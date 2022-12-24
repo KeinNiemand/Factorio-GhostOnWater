@@ -309,7 +309,7 @@ local function createDummyItem(originalItem)
 end
 
 local function ghostOnWaterDummyItemExists(itemName)
-    dummyName = constants.dummyPrefix .. itemName
+    local dummyName = constants.dummyPrefix .. itemName
     -- Check if the item already has a dummy
     return data.raw["item"][dummyName] ~= nil
 end
