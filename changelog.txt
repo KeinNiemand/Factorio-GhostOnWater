@@ -2,6 +2,11 @@
 Version: 0.11.1
 Date: 2022.12.24
   Info:
+    - Water Ghost Dummy Entitys should no longer be visable in crafting mods (e.g Factory Planner, Hellmod, FNEI, etc.) (Thakts to contribution by nekizalb https://github.com/nekizalb)
+---------------------------------------------------------------------------------------------------
+Version: 0.11.1
+Date: 2022.12.24
+  Info:
     - Moved Water Ghosts dummy entitys/tiems to their own subgroup
   Bugfixes:
     - Fixed crash when trying to convert a blueprint that contains no entities (Tile only Blueprints). (Thanks to Arios16 https://github.com/Arios16) pull request #27
