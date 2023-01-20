@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.11.1
-Date: 2022.12.24
+Version: 0.11.2
+Date: 2023.01.11
   Info:
     - Water Ghost Dummy Entitys should no longer be visable in crafting mods (e.g Factory Planner, Hellmod, FNEI, etc.) (Thakts to contribution by nekizalb https://github.com/nekizalb)
 ---------------------------------------------------------------------------------------------------
