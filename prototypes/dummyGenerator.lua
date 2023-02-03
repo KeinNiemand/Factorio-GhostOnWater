@@ -7,15 +7,15 @@ local table = require('__stdlib__/stdlib/utils/table')
 local waterCollisionMask = table.deepcopy(data.raw["tile"]["water"].collision_mask)
 -- collison masks that have to be removed from the collision mask of the dummy entity but are
 -- required to collide with other entites so entities can be placed on top of themselves/other entities
--- for compatibility with space exploration
---a new layer gets added to dummy entites + any original entity that has a collision mask that contains any of these layers
-local specialRemovalCollsionMask = {}
+-- mostly for compatibility with other mods (space exploration), but also for some special vanilla cases
+-- a new layer gets added to dummy entites + any original entity that has a collision mask that contains any of these layers
+local specialRemovalCollsionMask = {
+    ["floor-layer"] = "" --necessary for rail/chain signals
+}
 
 --space exploration compatibility
 if (mods ["space-exploration"]) then
-    specialRemovalCollsionMask = {
-        ["object-layer"] = ""
-    }
+    mask_util.add_layer(specialRemovalCollsionMask, "object-layer")
     --consider empty space as water so it also gets removed
 ---@diagnostic disable-next-line: undefined-global
     mask_util.add_layer(waterCollisionMask, empty_space_collision_layer)
@@ -88,7 +88,11 @@ local function addAlternativeLayerForSpeicalRemovals(entitys)
 
             local mask = mask_util.get_mask(prototype)
 
-            if mask_util.mask_contains_layer(mask, layer) then
+            -- rocks or trees should always receive the alternative layer, so these are marked for deconstruction when blueprinting over them
+            -- ignore trees and rocks which have no collision mask. They probably have none on purpose (e.g. Meteorites from space exploration)
+            local isRockOrTree = (prototype.type == "tree" or prototype.type == "simple-entity") and (next(mask) ~= nill)
+
+            if mask_util.mask_contains_layer(mask, layer) or isRockOrTree then
                 --add alt layer to entity
                 mask_util.add_layer(mask, altLayer)
                 prototype.collision_mask = mask
