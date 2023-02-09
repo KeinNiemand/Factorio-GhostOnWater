@@ -15,7 +15,7 @@ local specialRemovalCollsionMask = {
 
 --space exploration compatibility
 if (mods ["space-exploration"]) then
-    mask_util.add_layer(specialRemovalCollsionMask, "object-layer")
+    specialRemovalCollsionMask["object-layer"] = ""
     --consider empty space as water so it also gets removed
 ---@diagnostic disable-next-line: undefined-global
     mask_util.add_layer(waterCollisionMask, empty_space_collision_layer)
