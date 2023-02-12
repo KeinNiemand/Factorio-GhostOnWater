@@ -1,9 +1,9 @@
 {
     "name": "GhostOnWater",
-    "version": "0.11.2",
+    "version": "0.11.3",
     "title": "Ghost On Water",
     "author": "You",
     "factorio_version": "1.1",
-    "dependencies": ["base >= 1.1.72", "stdlib >= 1.4.7", "? LandfillPainting", "? space-exploration", "? kry-inserters"],
+    "dependencies": ["base >= 1.1.72", "stdlib >= 1.4.7", "? LandfillPainting", "? space-exploration", "? kry-inserters", "? WideChests"],
     "description": "This mod adds the ability to place ghosts (blueprints) on water or in empty space (space exploration).\nUsage press control + w while holding a blueprint to make it placable on water, then simply place it on water."
   }
