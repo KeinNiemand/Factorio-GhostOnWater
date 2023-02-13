@@ -10,6 +10,8 @@ local util = require('util')
 blueprints.updateBlueprint = function(playerIndex, replacerFunction)
     --get the player
     local player = game.players[playerIndex]
+    --saftey check: check if cursor stack is valid
+    if not player.cursor_stack then return end
     --check if player is holding a single blueprint or a book
     if player.cursor_stack.is_blueprint then
        blueprints.updateSingleBlueprint(player.cursor_stack, replacerFunction)
