@@ -16,6 +16,7 @@ local specialRemovalCollsionMask = {
 --space exploration compatibility
 if (mods ["space-exploration"]) then
     specialRemovalCollsionMask["object-layer"] = ""
+    specialRemovalCollsionMask["floor-layer"] = ""
     --consider empty space as water so it also gets removed
 ---@diagnostic disable-next-line: undefined-global
     mask_util.add_layer(waterCollisionMask, empty_space_collision_layer)
@@ -88,7 +89,11 @@ local function addAlternativeLayerForSpeicalRemovals(entitys)
 
             local mask = mask_util.get_mask(prototype)
 
-            if mask_util.mask_contains_layer(mask, layer) then
+            -- rocks or trees should always receive the alternative layer, so these are marked for deconstruction when blueprinting over them
+            -- ignore trees and rocks which have no collision mask. They probably have none on purpose (e.g. Meteorites from space exploration)
+            local isRockOrTree = (prototype.type == "tree" or prototype.type == "simple-entity") and (next(mask) ~= nill)
+
+            if mask_util.mask_contains_layer(mask, layer) or isRockOrTree then
                 --add alt layer to entity
                 mask_util.add_layer(mask, altLayer)
                 prototype.collision_mask = mask
