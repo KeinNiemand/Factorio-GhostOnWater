@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.11.4
+Date: 2023.02.21
+  Bugfixes:
+    - Fixed Water Ghost Rails Signals and Rail Chain not colliding with trees/Rocks (Thanks to contribution by ChaosSaber)
+    - Fixed Water Ghost SE pylons not colliding with anything (Thanks to contribution by ChaosSaber)
+---------------------------------------------------------------------------------------------------
 Version: 0.11.3
 Date: 2023.02.13
   Bugfixes:
