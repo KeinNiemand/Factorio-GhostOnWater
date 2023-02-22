@@ -40,12 +40,12 @@ local function canPlaceOriginalEntity(originalEntityName, dummyEntity)
     --get direction
     local direction = dummyEntity.direction
     --check if the original entity can be placed
-    if dummyEntity.ghost_type == "offshore-pump" then
+    --if dummyEntity.ghost_type == "offshore-pump" then
         --offshore pump is a special case because it can be placed on water so we use a diffrent build_check_type
         --check if the original entity can be placed on water
         --return surface.can_place_entity { name = originalEntityName, position = position, direction = direction, force = dummyEntity.force, build_check_type = defines.build_check_type.blueprint_ghost, forced = true }
-        return surface.can_fast_replace { name = originalEntityName, position = position, direction = direction, force = dummyEntity.force }
-    end
+    --    return surface.can_fast_replace { name = originalEntityName, position = position, direction = direction, force = dummyEntity.force }
+    --end
 
     return surface.can_place_entity { name = originalEntityName, position = position, direction = direction }
 end
