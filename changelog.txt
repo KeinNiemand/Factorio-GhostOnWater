@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.11.5
+Date: 2023.04.04
+  Bugfixes:
+    - Fixed incompatibility(crash) when used with IR3
+    - Fixed Train Selection Priority somtimes selected trains over rails (code from SpidertronWeaponSwitcher by Xorimuth/tburrows13 was used to fix this)
+      Thanks for explaining how to fix this to me, Xorimuth!
+---------------------------------------------------------------------------------------------------
 Version: 0.11.4
 Date: 2023.02.21
   Bugfixes:
