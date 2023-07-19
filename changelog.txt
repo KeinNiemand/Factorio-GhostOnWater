@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.11.6
+Date: 2023.07.19
+  Info:
+    - Hotfix Release becouse a Factorio update (somewhere between 1.1.81 and 1.1.87) broke recepies beeing preserved
+    - Please note that Recpies no longer get removed from WaterGhost entitys which mean they can show up in
+      crafting mods again, removing them no longer works becouse of the Factorio update.
+  Bugfixes:
+    - Fixed Recepies no longer beeing preserved
+---------------------------------------------------------------------------------------------------
 Version: 0.11.5
 Date: 2023.04.04
   Bugfixes:
