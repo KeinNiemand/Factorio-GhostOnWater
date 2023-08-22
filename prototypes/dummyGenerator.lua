@@ -1,8 +1,12 @@
+---------------------------------------Requires-------------------------------------------------------------
 local constants = require('modules/constants')
 local mask_util = require("collision-mask-util")
 local util = require("util")
 local Is = require('__stdlib__/stdlib/utils/is')
 local table = require('__stdlib__/stdlib/utils/table')
+
+---------------------------------------Setup-----------------------------------------------------------------
+local dummyGenerator = {}
 --Collsion mask that gets removed from water ghost dummy entities, things lke space may get added to this list even though they are not water
 local waterCollisionMask = table.deepcopy(data.raw["tile"]["water"].collision_mask)
 -- collison masks that have to be removed from the collision mask of the dummy entity but are
@@ -13,39 +17,59 @@ local specialRemovalCollsionMask = {
     ["item-layer"] = "" --necessary for rail/chain signals colliding with trees
 }
 
---space exploration compatibility
-if (mods ["space-exploration"]) then
-    specialRemovalCollsionMask["object-layer"] = "" -- collision layer for empty space, but needed for most object collisions
-    specialRemovalCollsionMask["water-tile"] = "" -- Workaround until SE adds the item-layer collision to all entities placeable in empty space
-
-    --consider empty space as water so it also gets removed
----@diagnostic disable-next-line: undefined-global
-    mask_util.add_layer(waterCollisionMask, empty_space_collision_layer)
-end
-
---alien biomes shallow water compatibility
-if (mods ["alien-biomes"]) then
-    --shalloow water
-    mask_util.add_layer(waterCollisionMask, "floor-layer")
-    specialRemovalCollsionMask["floor-layer"] = "" -- necessary, because it is the only common collision layer between rail/chain signals and transport belts, heat pipes
-end
-
-
-
---add anything in specialRemovalCollsionMask to waterCollisionMask so it gets removed from the dummy entity
-table.each(specialRemovalCollsionMask, (function(altLayer ,layer)
-    mask_util.add_layer(waterCollisionMask, layer)
-end))
-
---generate table with all entity prototypes
+--table with all entity prototypes
 local entityTable = {}
-for type in pairs(defines.prototypes.entity) do
-    for _, prototype in pairs(data.raw[type]) do
-        entityTable[prototype.name] = prototype
+
+
+local dummyEntityCreatedFor =  {}
+
+---------------------------------------Dummy Generator Functions-------------------------------------------------
+
+
+
+---Handles compatibility with other mods, specifcly cases where things need to be done in init (changes to waterCollisonMask and specialRemovalCollsionMask)
+local function modSpecificCompatibility()
+    --space exploration compatibility
+    if (mods["space-exploration"]) then
+        specialRemovalCollsionMask["object-layer"] =
+        ""                                          -- collision layer for empty space, but needed for most object collisions
+        specialRemovalCollsionMask["water-tile"] =
+        ""                                          -- Workaround until SE adds the item-layer collision to all entities placeable in empty space
+
+        --consider empty space as water so it also gets removed
+        ---@diagnostic disable-next-line: undefined-global
+        mask_util.add_layer(waterCollisionMask, empty_space_collision_layer)
+    end
+
+    --alien biomes shallow water compatibility
+    if (mods["alien-biomes"]) then
+        --shalloow water
+        mask_util.add_layer(waterCollisionMask, "floor-layer")
+        specialRemovalCollsionMask["floor-layer"] =
+        ""                                         -- necessary, because it is the only common collision layer between rail/chain signals and transport belts, heat pipes
     end
 end
 
-local dummyGenerator = {}
+local function addSpecialRemovalsToWaterCollisons()
+    --add anything in specialRemovalCollsionMask to waterCollisionMask so it gets removed from the dummy entity
+    table.each(specialRemovalCollsionMask, (function(altLayer ,layer)
+        mask_util.add_layer(waterCollisionMask, layer)
+    end))
+end
+---generate table with all entity prototypes, stored in the file scope local entityTable
+local function fillEntityTable()
+    for type in pairs(defines.prototypes.entity) do
+        for _, prototype in pairs(data.raw[type]) do
+            entityTable[prototype.name] = prototype
+        end
+    end
+end
+
+local function init()
+    modSpecificCompatibility()
+    addSpecialRemovalsToWaterCollisons()
+    fillEntityTable()
+end
 
 --todo move this to a separate file or use stdlib
 --function to check if a table contains a key without using a loop
@@ -157,7 +181,6 @@ local function  removeCollisionMaskFromCollisonmask(mask, maskToRemove)
     end
 end
 
-local dummyEntityCreatedFor =  {}
 
 local function createDummyEntity(originalEntity)
     local dummyEntity = table.deepcopy(originalEntity)
@@ -344,6 +367,8 @@ end
 
 
 dummyGenerator.GenerateDummyPrototypes = function()
+    --initilise the dummy generator
+    init()
 
     --handle special removals
     addAlternativeLayerForSpeicalRemovals(entityTable)
