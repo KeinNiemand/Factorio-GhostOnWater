@@ -20,12 +20,38 @@ local specialRemovalCollsionMask = {
 --table with all entity prototypes
 local entityTable = {}
 
-
 local dummyEntityCreatedFor =  {}
 
+local waterFillFound = false
 ---------------------------------------Dummy Generator Functions-------------------------------------------------
 
+--todo move this to a separate file or use stdlib
+--function to check if a table contains a key without using a loop
+function table.contains(table, key)
+    return table[key] ~= nil
+end
 
+--todo move this to a separate file or use stdlib
+--function to check if a table contains a value
+function table.containsValue(table, value)
+    for k, v in pairs(table) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+--todo move this to a separate file or use stdlib
+--function to get the index of a value in a table
+function table.indexOf(table, value)
+    for k, v in pairs(table) do
+        if v == value then
+            return k
+        end
+    end
+    return nil
+end
 
 ---Handles compatibility with other mods, specifcly cases where things need to be done in init (changes to waterCollisonMask and specialRemovalCollsionMask)
 local function modSpecificCompatibility()
@@ -65,39 +91,35 @@ local function fillEntityTable()
     end
 end
 
+--Check Wheter or not Water tile is placable (=> some kind of waterfill mod installed)
+local function checkWaterTileIsPlacable()
+    for name, prototypeItem in pairs(data.raw["item"]) do
+        if not prototypeItem.place_as_tile then
+            goto nextItem
+        end
+
+        if prototypeItem.place_as_tile.result:sub(1, 5) == "water" then
+            return true
+        end 
+
+        ::nextItem::
+    end
+end 
+
 local function init()
     modSpecificCompatibility()
     addSpecialRemovalsToWaterCollisons()
     fillEntityTable()
-end
 
---todo move this to a separate file or use stdlib
---function to check if a table contains a key without using a loop
-function table.contains(table, key)
-    return table[key] ~= nil
-end
-
---todo move this to a separate file or use stdlib
---function to check if a table contains a value
-function table.containsValue(table, value)
-    for k, v in pairs(table) do
-        if v == value then
-            return true
-        end
+    --remove ground-tile from all collision masks if there is a water fill mod
+    waterFillFound = checkWaterTileIsPlacable()
+    if waterFillFound then
+        mask_util.add_layer(waterCollisionMask, "ground-tile")
     end
-    return false
 end
 
---todo move this to a separate file or use stdlib
---function to get the index of a value in a table
-function table.indexOf(table, value)
-    for k, v in pairs(table) do
-        if v == value then
-            return k
-        end
-    end
-    return nil
-end
+
+
 
 --adds alternative layer for special removal collision mask
 local function addAlternativeLayerForSpeicalRemovals(entitys)
@@ -204,8 +226,15 @@ local function createDummyEntity(originalEntity)
     if originalTest then
         if (not table.is_empty(originalTest)) and Is.Table(originalTest) then
             mask_util.add_layer(dummyEntity.fluid_box_tile_collision_test, "water-tile")
-    elseif Is.String(originalTest) then
-            dummyEntity.fluid_box_tile_collision_test = "water-tile"
+            if (waterFillFound) then
+                mask_util.add_layer(dummyEntity.fluid_box_tile_collision_test, "ground-tile")
+            end
+        elseif Is.String(originalTest) then
+            if (waterFillFound) then
+                dummyEntity.fluid_box_tile_collision_test = {"water-tile", "ground-tile"}
+            else 
+                dummyEntity.fluid_box_tile_collision_test = {"water-tile"}
+            end
         end
 
     end
@@ -213,9 +242,16 @@ local function createDummyEntity(originalEntity)
 
         --if originalTest2 is not empty
         if not table.is_empty(originalTest2) and Is.Table(originalTest2) then
-            mask_util.add_layer(originalTest2 ,"water-tile")
+            mask_util.add_layer(dummyEntity.adjacent_tile_collision_test ,"water-tile")
+            if (waterFillFound) then
+                mask_util.add_layer(dummyEntity.adjacent_tile_collision_test, "ground-tile")
+            end
         elseif Is.String(originalTest2) then
-            dummyEntity.adjacent_tile_collision_test = "water-tile"
+            if (waterFillFound) then
+                dummyEntity.adjacent_tile_collision_test = {"water-tile", "ground-tile"}
+            else 
+                dummyEntity.adjacent_tile_collision_test = "water-tile"
+            end
         end
 
     end
