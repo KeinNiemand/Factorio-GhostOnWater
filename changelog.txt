@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.12.0
+Date: 2023.08.23
+  Info:
+    - This update makes some major changes to how landfill placment works it may cause unexcpected behaviour.
+      Please report any bugs you find.
+  Features:
+    - Automatically place waterfill under the tiles of offshore pumps that need to be in water,
+      Requires some kind of waterfill mod to be installed, may not work with all waterfill mods (only ones that place some type of water whose tile name starts with water which applies to all vanilla water tiles).
+
+---------------------------------------------------------------------------------------------------
 Version: 0.11.7
 Date: 2023.08.20
   Bugfixes:
