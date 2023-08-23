@@ -20,7 +20,9 @@ Compatibility
 =========
  *   Supports Landfill types from Landfill Painting mod (included in seablock). You can select the used landfill type in mod settings.
 *    Supports placing blueprints in Space in Space Exploration. You can select the type of platform build in space in mod settings (setting is only visable if space exploration is installed)
+*    NEW in 0.12.0! Supports most but not all waterfill mods, if a waterfill mod is installed waterfill will automatically be placed for offshore pump water ghosts.
 *    This mod should be compatible with entities from most if not all other mods.  Please report anything incompatible.
+
 
 How this mod works
 ================
