@@ -37,6 +37,11 @@ local function getLandfillType(tile, colision)
         if waterGhostCommon.maskCollidesWithMaskRuntime(colision, landfillCollisionMask) then
             goto nextLandfillType
         end
+
+        if tile.prototype.name == v.name then
+            goto nextLandfillType
+        end
+        
         do return v end
         ::nextLandfillType::
     end
