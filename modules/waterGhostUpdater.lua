@@ -74,6 +74,12 @@ waterGhostUpdater.waterGhostUpdate = function(event)
     --return if the known water ghosts queue is empty
     if #global.GhostOnWater.KnownWaterGhosts == 0 then return end
 
+
+    --this should only be called once but I'm to lazy to add a callback and I can't call it directly from control since that would be a diffrent instance
+    landfillPlacer:init()
+    --fill available landfill types, called once per update to make sure it's up to date with settings
+    --disabled since init already calls this
+    --landfillPlacer:reFillActiveLandfillTypes()
     --loop trough all known water ghosts
 
     for i = 1, math.min(#global.GhostOnWater.KnownWaterGhosts, settings.global.WaterGhostMaxWaterGhostsPerUpdate.value) do
@@ -87,10 +93,10 @@ waterGhostUpdater.waterGhostUpdate = function(event)
         if not Is.valid(waterGhostEntity) then goto continue end
         if not util.string_starts_with(waterGhostEntity.ghost_name, constants.dummyPrefix) then goto continue end
         --place ghost landfill under dummy entity ghost
-        landfillPlacer.placeGhostLandfill(waterGhostEntity, knownWaterGhostInfo.tiles)
+        landfillPlacer.placeGhostLandfill(waterGhostEntity)
         
         --entity is still valid after replacing so it needs to be pushed back onto the queue
-        global.GhostOnWater.KnownWaterGhosts({ghost = waterGhostEntity, tiles = knownWaterGhostInfo.tiles})
+        global.GhostOnWater.KnownWaterGhosts({ghost = waterGhostEntity})
 
         ::continue::
     end

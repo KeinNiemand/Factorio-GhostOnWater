@@ -7,6 +7,8 @@ local Queue = require('__stdlib__/stdlib/misc/queue')
 local Is = require('__stdlib__/stdlib/utils/is')
 local blueprints = require('modules/blueprints')
 local waterGhostUpdater = require('modules/waterGhostUpdater')
+local waterGhostCommon = require('modules/waterGhostCommon')
+
 
 
 --get all entity prototypes names whos name starts with constants.dummyPrefix
@@ -46,7 +48,8 @@ local function reInitGlobalTable()
         global.GhostOnWater.emptySpaceCollsion = table.first(table.keys(emptySpaceTileCollisionLayerPrototype.collision_mask))
     end
 
-
+    --compatiblity with waterfill mods
+    global.GhostOnWater.placableWaterTile = waterGhostCommon.getPlacableWaterTile()
 end
 
 local function onLoad()
@@ -55,27 +58,6 @@ local function onLoad()
 end
 
 --event handlers for everything non inilisation related
-
---checks if runtime mod settings that need to be applied changed and applies them
--- local function updateSettings()
---     if (settings.global["WaterGhostUpdateDelay"]) then
---         local previousUpdateRate = updateRate
--- ---@diagnostic disable-next-line: cast-local-type
---         updateRate = settings.global["WaterGhostUpdateDelay"].value
---         --don't do anything if the update rate hasn't changed
---         if (previousUpdateRate == updateRate) then return end
-
---         --remove the old event
---         Event.remove(previousUpdateRate * -1, waterGhostUpdater.waterGhostUpdate)
---         Event.on_nth_tick(updateRate, waterGhostUpdater.waterGhostUpdate)
-
---     else
---         game.print("WaterGhostUpdateRate setting not found")
---         return
---     end
-
-
--- end
 
 --runs when user triggers a blueprint update with the shortcut or hotkey
 local function onBlueprintUpdateTriggerd(event)

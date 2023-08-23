@@ -98,12 +98,14 @@ local function checkWaterTileIsPlacable()
             goto nextItem
         end
 
-        if prototypeItem.place_as_tile.result:sub(1, 5) == "water" then
+        if string.sub(prototypeItem.place_as_tile.result, 1, 5)== "water" then
             return true
         end 
 
         ::nextItem::
     end
+
+    return false
 end 
 
 local function init()
