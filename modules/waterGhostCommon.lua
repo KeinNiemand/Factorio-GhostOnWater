@@ -36,4 +36,61 @@ waterGhostCommon.maskCollidesWithMaskRuntime = function(mask1, mask2)
     return table.any(mask1, function(mask1Value, mask1) return mask2[mask1] end)
 end
 
+---calculate boudning box (collison box with respect to entity posistion and direction)
+waterGhostCommon.calculateBoundingBox = function(entity_position, collision_box, direction)
+    -- Step 1: Calculate unrotated bounding box relative to entity_position
+    local unrotated_left_top = {
+        x = entity_position.x + collision_box.left_top.x,
+        y = entity_position.y + collision_box.left_top.y
+    }
+    local unrotated_right_bottom = {
+        x = entity_position.x + collision_box.right_bottom.x,
+        y = entity_position.y + collision_box.right_bottom.y
+    }
+
+    -- Step 2: Rotate bounding box
+    if direction == defines.direction.east then  -- East
+        return {
+            left_top = {
+                x = entity_position.x - collision_box.left_top.y,
+                y = entity_position.y + collision_box.left_top.x
+            },
+            right_bottom = {
+                x = entity_position.x - collision_box.right_bottom.y,
+                y = entity_position.y + collision_box.right_bottom.x
+            },
+            orientation = 90
+        }
+    elseif direction == defines.direction.south then  -- South
+        return {
+            left_top = {
+                x = entity_position.x - collision_box.left_top.x,
+                y = entity_position.y - collision_box.left_top.y
+            },
+            right_bottom = {
+                x = entity_position.x - collision_box.right_bottom.x,
+                y = entity_position.y - collision_box.right_bottom.y
+            },
+            orientation = 180
+        }
+    elseif direction == defines.direction.west then  -- West
+        return {
+            left_top = {
+                x = entity_position.x + collision_box.left_top.y,
+                y = entity_position.y - collision_box.left_top.x
+            },
+            right_bottom = {
+                x = entity_position.x + collision_box.right_bottom.y,
+                y = entity_position.y - collision_box.right_bottom.x
+            },
+            orientation = 270
+        }
+    else  -- North or any other case
+        return {
+            left_top = unrotated_left_top,
+            right_bottom = unrotated_right_bottom
+        }
+    end
+end
+
 return waterGhostCommon

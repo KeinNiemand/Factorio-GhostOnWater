@@ -23,12 +23,14 @@ end
 
 ---finds the appropiate landfill type for a given tile and entity collision mask based on avaible landfill
 local function getLandfillType(tile, colision)
+    -- get first first item that places tile
     local tileCollsion = tile.prototype.collision_mask
-    local landFillForCollision = landfillPlacer.activeLandfillTypes
     for i, v in ipairs(landfillPlacer.activeLandfillTypes) do
         local landfillCollisionMask = v.collision_mask
-
-        if waterGhostCommon.maskCollidesWithMaskRuntime(tileCollsion, landfillCollisionMask) then
+        local itemName = v.items_to_place_this[1].name
+        local itemToPlace = game.item_prototypes[itemName]
+        local landfillTileCollisionMask = itemToPlace.place_as_tile_result.condition
+        if waterGhostCommon.maskCollidesWithMaskRuntime(tileCollsion, landfillTileCollisionMask) then
             goto nextLandfillType
         end
 
@@ -40,23 +42,9 @@ local function getLandfillType(tile, colision)
     end
 end
 
---local function getLandfillTypeForCollision()
---    --local emptySpaceTileCollisionLayerPrototype = game.entity_prototypes["collision-mask-empty-space-tile"]
---    local landfillTpyeForCollision = {} 
---    landfillTpyeForCollision["water-tile"] = settings.global.WaterGhostUsedLandfillType.value
---    --landfillTpyeForCollision["player-layer"] = settings.global.WaterGhostUsedLandfillType.value
---    --add empty space collison if it exists for space exploration compatibility
---    if global.GhostOnWater.emptySpaceCollsion then
---        landfillTpyeForCollision["object-layer"] = settings.global.WaterGhostUsedSpaceLandfillType.value
---    end
---
---    --Compatibility with waterfill mods
---    if (global.GhostOnWater.placableWaterTile) then
---        landfillTpyeForCollision["ground-tile"] = global.GhostOnWater.placableWaterTile.name
---    end
---
---    return landfillTpyeForCollision
---end
+
+
+
 
 local function getTileDataForBoundingBoxes(entity)
     local tileData = {}
@@ -114,7 +102,9 @@ local function getTileDataForBoundingBoxes(entity)
         if (table.any(pumpLandfillOnCollisonMask, function(mask)
             return prototype.adjacent_tile_collision_mask[mask]
         end)) then
-            local adjacentBoundingBox = Area.offset(prototype.adjacent_tile_collision_box, entity.position)
+
+            local adjacentBoundingBox = waterGhostCommon.calculateBoundingBox(entity.position, prototype.adjacent_tile_collision_box, entity.direction)
+
             table.insert(tileData,getTileData(adjacentBoundingBox, prototype.adjacent_tile_collision_mask, prototype.adjacent_tile_collision_test))
         end
         
@@ -180,7 +170,7 @@ landfillPlacer.reFillActiveLandfillTypes = function(self)
     table.insert(self.activeLandfillTypes, game.tile_prototypes[settings.global.WaterGhostUsedLandfillType.value])
 
     if global.GhostOnWater.emptySpaceCollsion then
-        table.insert(self.activeLandfillTypes, game.tile_prototypes[settings.global.WaterGhostUsedLandfillType.value])
+        table.insert(self.activeLandfillTypes, game.tile_prototypes[settings.global.WaterGhostUsedSpaceLandfillType.value])
     end
 
     if global.GhostOnWater.placableWaterTile then
