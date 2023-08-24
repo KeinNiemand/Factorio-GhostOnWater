@@ -23,10 +23,30 @@ end
 
 ---finds the appropiate landfill type for a given tile and entity collision mask based on avaible landfill
 local function getLandfillType(tile, colision)
+    --nil check guards
+    if not tile then
+        return 
+    end
+
+    if not colision then
+        return
+    end
+
     -- get first first item that places tile
     local tileCollsion = tile.prototype.collision_mask
+
+    if not tileCollsion then
+        return
+    end
+    
     for i, v in ipairs(landfillPlacer.activeLandfillTypes) do
+        if (not v) then
+            goto nextLandfillType
+        end
         local landfillCollisionMask = v.collision_mask
+        if not (landfillCollisionMask and tileCollsion) then
+            goto nextLandfillType
+        end
         local itemName = v.items_to_place_this[1].name
         local itemToPlace = game.item_prototypes[itemName]
         local landfillTileCollisionMask = itemToPlace.place_as_tile_result.condition
