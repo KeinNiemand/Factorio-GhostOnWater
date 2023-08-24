@@ -33,6 +33,15 @@ end
 
 ---function to check if two collision masks collide with each other (returns true if they collide)
 waterGhostCommon.maskCollidesWithMaskRuntime = function(mask1, mask2)
+    --if mask1 is nil return false becouse no mask = no collision
+    if not mask1 then
+        return false
+    end
+    --if mask2 is nil return false becouse no mask = no collision
+    if not mask2 then
+        return false
+    end
+    --check if the masks collide
     return table.any(mask1, function(mask1Value, mask1) return mask2[mask1] end)
 end
 

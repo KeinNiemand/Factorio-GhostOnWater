@@ -28,41 +28,39 @@ local function getLandfillType(tile, colision)
         return 
     end
 
-    if not colision then
-        return
-    end
-
     -- get first first item that places tile
     local tileCollsion = tile.prototype.collision_mask
-
-    if not tileCollsion then
-        return
-    end
     
-    for i, v in ipairs(landfillPlacer.activeLandfillTypes) do
-        if (not v) then
+    for i, landFillType in ipairs(landfillPlacer.activeLandfillTypes) do
+
+        --Skip if the landfill type is nil should basically never happen so this check my be uneccary
+        if (not landFillType) then
             goto nextLandfillType
         end
-        local landfillCollisionMask = v.collision_mask
-        if not (landfillCollisionMask and tileCollsion) then
-            goto nextLandfillType
-        end
-        local itemName = v.items_to_place_this[1].name
+        
+        local landfillCollisionMask = landFillType.collision_mask
+        local itemName = landFillType.items_to_place_this[1].name
         local itemToPlace = game.item_prototypes[itemName]
-        local landfillTileCollisionMask = itemToPlace.place_as_tile_result.condition
-        if waterGhostCommon.maskCollidesWithMaskRuntime(tileCollsion, landfillTileCollisionMask) then
+        local landfillPlaceCollisionMask = itemToPlace.place_as_tile_result.condition
+
+        --Skip if the tile is already the same type as the landfill
+        if tile.prototype.name == landFillType.name then
             goto nextLandfillType
         end
 
+        --Skip if this landfill can't be placed on this tile
+        if waterGhostCommon.maskCollidesWithMaskRuntime(tileCollsion, landfillPlaceCollisionMask) then
+            goto nextLandfillType
+        end
+
+        --Skip if the entiy can't be placed on the tile
         if waterGhostCommon.maskCollidesWithMaskRuntime(colision, landfillCollisionMask) then
             goto nextLandfillType
         end
 
-        if tile.prototype.name == v.name then
-            goto nextLandfillType
-        end
+
         
-        do return v end
+        do return landFillType end
         ::nextLandfillType::
     end
 end
