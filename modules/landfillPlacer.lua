@@ -173,11 +173,6 @@ landfillPlacer.placeGhostLandfill = function(dummyEntity)
             if tile.has_tile_ghost() then
                 return
             end
-
-            --check if the enity can already be placed on the current tile
-            if (not waterGhostCommon.maskCollidesWithMaskRuntime(tile.prototype.collision_mask, tilesData.collision_mask)) then
-                return
-            end
     
             local usedLandfillType = getLandfillType(tile, tilesData.collision_mask)
 
