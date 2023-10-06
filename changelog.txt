@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.12.2
+Date: 2023.10.06
+  Bugfixes:
+    - Fixed Waterfill Ghosts beeing placed under water placable entitys that can also be placed on land, when they where
+      build on land and and blocked by something like a rock.
+      I was missing a check to see if the entiy can already be placed on a tile before adding tile ghosts
+---------------------------------------------------------------------------------------------------
 Version: 0.12.1
 Date: 2023.08.24
   Bugfixes:
